@@ -1,0 +1,261 @@
+// ─────────────────────────────────────────────
+//  DUELZONE – Shared Types
+// ─────────────────────────────────────────────
+
+export type GameId =
+  | 'find-match'
+  | 'tic-tac-toe'
+  | 'connect-four'
+  | 'rock-paper-scissors'
+  | 'reaction-duel'
+  | 'quick-tap'
+  | 'memory-duel'
+  | 'number-battle'
+  | 'color-clash'
+  | 'dots-and-boxes';
+
+export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK';
+
+export interface GameDefinitionMeta {
+  id: GameId;
+  name: string;
+  description: string;
+  category: GameCategory;
+  minPlayers: number;
+  maxPlayers: number;
+  estimatedMinutes: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  icon: string; // emoji fallback
+}
+
+// ─── Players ──────────────────────────────────
+export interface Player {
+  id: string;           // server-generated
+  socketId: string;
+  name: string;
+  avatarSeed: string;
+  accentColor: string;
+  isHost: boolean;
+  isConnected: boolean;
+  gamesWon: number;
+}
+
+export type PlayerSlot = 1 | 2;
+
+// ─── Room ─────────────────────────────────────
+export type RoomStatus = 'waiting' | 'lobby' | 'playing' | 'finished';
+
+export interface Room {
+  code: string;
+  status: RoomStatus;
+  players: Player[];
+  selectedGame: GameId | null;
+  gameState: unknown;
+  createdAt: number;
+  lastActivity: number;
+}
+
+// ─── Socket Events ────────────────────────────
+export interface ServerToClientEvents {
+  'room:update': (room: RoomSnapshot) => void;
+  'room:error': (msg: string) => void;
+  'game:state': (state: unknown) => void;
+  'game:event': (event: GameEvent) => void;
+  'chat:message': (msg: ChatMessage) => void;
+  'player:reconnected': (playerId: string) => void;
+  'room:closed': (reason: string) => void;
+}
+
+export interface ClientToServerEvents {
+  'room:create': (payload: { playerName: string }, cb: (res: RoomCreateResponse) => void) => void;
+  'room:join': (payload: { code: string; playerName: string }, cb: (res: RoomJoinResponse) => void) => void;
+  'room:reconnect': (payload: { code: string; playerId: string }, cb: (res: RoomJoinResponse) => void) => void;
+  'room:selectGame': (payload: { gameId: GameId }) => void;
+  'room:startGame': () => void;
+  'room:returnToLobby': () => void;
+  'game:action': (payload: GameAction) => void;
+  'chat:send': (payload: { text: string }) => void;
+}
+
+export interface InterServerEvents {}
+export interface SocketData {
+  playerId: string;
+  roomCode: string;
+}
+
+// ─── Response shapes ──────────────────────────
+export interface RoomCreateResponse {
+  ok: boolean;
+  error?: string;
+  room?: RoomSnapshot;
+  player?: Player;
+}
+
+export interface RoomJoinResponse {
+  ok: boolean;
+  error?: string;
+  room?: RoomSnapshot;
+  player?: Player;
+}
+
+export interface RoomSnapshot {
+  code: string;
+  status: RoomStatus;
+  players: Player[];
+  selectedGame: GameId | null;
+  gameState: unknown;
+}
+
+// ─── Game Actions / Events ────────────────────
+export interface GameAction {
+  type: string;
+  payload?: unknown;
+}
+
+export interface GameEvent {
+  type: string;
+  payload?: unknown;
+}
+
+// ─── Chat ─────────────────────────────────────
+export interface ChatMessage {
+  id: string;
+  playerId: string;
+  playerName: string;
+  text: string;
+  timestamp: number;
+}
+
+// ─── Find Match ───────────────────────────────
+export interface FindMatchSymbol {
+  id: string;
+  x: number;   // 0-1 relative
+  y: number;
+  size: number; // 0-1 relative scale
+  rotation: number;
+}
+
+export interface FindMatchRoundState {
+  round: number;
+  totalRounds: number;
+  commonSymbolId: string;
+  player1Symbols: FindMatchSymbol[];
+  player2Symbols: FindMatchSymbol[];
+  startedAt: number | null;   // server timestamp
+  phase: 'countdown' | 'playing' | 'result';
+  winner: string | null;  // playerId
+  scores: Record<string, number>;
+  difficulty: 'easy' | 'normal' | 'hard' | 'insane';
+}
+
+// ─── Tic Tac Toe ──────────────────────────────
+export interface TicTacToeState {
+  board: (string | null)[];  // 9 cells, playerId or null
+  currentTurn: string;       // playerId
+  winner: string | null;
+  isDraw: boolean;
+  scores: Record<string, number>;
+  round: number;
+}
+
+// ─── Connect Four ─────────────────────────────
+export interface ConnectFourState {
+  board: (string | null)[][];  // [row][col], playerId or null
+  currentTurn: string;
+  winner: string | null;
+  isDraw: boolean;
+  scores: Record<string, number>;
+  winningCells: [number, number][];
+}
+
+// ─── Rock Paper Scissors ──────────────────────
+export type RPSChoice = 'rock' | 'paper' | 'scissors';
+
+export interface RPSState {
+  round: number;
+  totalRounds: number;
+  choices: Record<string, RPSChoice | null>;
+  revealed: boolean;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+}
+
+// ─── Reaction Duel ────────────────────────────
+export interface ReactionDuelState {
+  round: number;
+  totalRounds: number;
+  phase: 'waiting' | 'ready' | 'go' | 'result';
+  goTime: number | null;
+  reactions: Record<string, number | 'false-start' | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  reactionTimes: Record<string, number[]>;
+}
+
+// ─── Quick Tap ────────────────────────────────
+export interface QuickTapState {
+  phase: 'countdown' | 'playing' | 'result';
+  startTime: number | null;
+  endTime: number | null;
+  tapCounts: Record<string, number>;
+  winner: string | null;
+}
+
+// ─── Memory Duel ──────────────────────────────
+export interface MemoryCard {
+  id: number;
+  symbol: string;
+  flipped: boolean;
+  matched: boolean;
+}
+
+export interface MemoryDuelState {
+  cards: MemoryCard[];
+  currentTurn: string;
+  flippedCards: number[];
+  scores: Record<string, number>;
+  winner: string | null;
+  isDone: boolean;
+}
+
+// ─── Number Battle ────────────────────────────
+export interface NumberBattleState {
+  round: number;
+  totalRounds: number;
+  target: number;
+  playerNumbers: Record<string, number[]>;   // each player's hand
+  choices: Record<string, number | null>;
+  revealed: boolean;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+}
+
+// ─── Color Clash ──────────────────────────────
+export interface ColorClashState {
+  round: number;
+  totalRounds: number;
+  word: string;
+  inkColor: string;   // the actual correct answer
+  wordColor: string;  // the distractor color
+  choices: Record<string, string | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'playing' | 'result';
+  startedAt: number | null;
+}
+
+// ─── Dots & Boxes ─────────────────────────────
+export interface DotsAndBoxesState {
+  gridSize: number;   // e.g. 4 = 4x4 boxes
+  horizontalEdges: (string | null)[][];  // [row][col] playerId
+  verticalEdges: (string | null)[][];
+  boxes: (string | null)[][];           // completed box owner
+  currentTurn: string;
+  scores: Record<string, number>;
+  winner: string | null;
+  isDone: boolean;
+}
