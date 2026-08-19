@@ -1,6 +1,6 @@
 import React from 'react';
 import { Socket } from 'socket.io-client';
-import { FindMatchRoundState, Player } from '../shared/types';
+import { FindMatchRoundState, FindMatchSymbol, Player } from '../../shared/types';
 import { SymbolIcon } from '../SymbolIcon';
 import { sounds } from '../../lib/sound';
 
@@ -96,7 +96,7 @@ export const FindMatchGame: React.FC<FindMatchProps> = ({
             Your Board
           </span>
           <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] bg-slate-100 rounded-full border-8 border-purple-500/40 shadow-inner relative overflow-hidden flex items-center justify-center">
-            {mySymbols.map((s, idx) => {
+            {mySymbols.map((s: FindMatchSymbol, idx: number) => {
               const angle = (idx / mySymbols.length) * 2 * Math.PI;
               const radius = 95;
               const x = Math.cos(angle) * radius;
@@ -125,7 +125,7 @@ export const FindMatchGame: React.FC<FindMatchProps> = ({
             {opponentPlayer?.name || 'Opponent'}'s Board
           </span>
           <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] bg-slate-200 rounded-full border-8 border-pink-500/30 shadow-inner relative overflow-hidden flex items-center justify-center pointer-events-none">
-            {oppSymbols.map((s, idx) => {
+            {oppSymbols.map((s: FindMatchSymbol, idx: number) => {
               const angle = (idx / oppSymbols.length) * 2 * Math.PI;
               const radius = 95;
               const x = Math.cos(angle) * radius;
