@@ -172,7 +172,7 @@ function registerSocketHandlers(io) {
                 io.to(roomCode).emit('room:update', RM.snapshot(room));
         });
         // ─── Chat ──────────────────────────────────────────────────────────────
-        socket.on('chat:send', ({ text }) => {
+        socket.on('chat:send', ({ text, emote }) => {
             const playerId = socket.data.playerId;
             const roomCode = socket.data.roomCode;
             if (!playerId || !roomCode)
@@ -183,14 +183,15 @@ function registerSocketHandlers(io) {
             const player = room.players.find(p => p.id === playerId);
             if (!player)
                 return;
-            const clean = text.trim().slice(0, constants_1.MAX_CHAT_LENGTH);
-            if (!clean)
+            const clean = typeof text === 'string' ? text.trim().slice(0, constants_1.MAX_CHAT_LENGTH) : '';
+            if (!clean && !emote)
                 return;
             const msg = {
                 id: (0, uuid_1.v4)(),
-                playerId,
-                playerName: player.name,
-                text: clean,
+                senderId: playerId,
+                senderName: player.name,
+                ...(clean ? { text: clean } : {}),
+                ...(emote ? { emote } : {}),
                 timestamp: Date.now(),
             };
             io.to(roomCode).emit('chat:message', msg);

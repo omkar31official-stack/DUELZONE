@@ -74,7 +74,7 @@ export interface ClientToServerEvents {
   'room:startGame': () => void;
   'room:returnToLobby': () => void;
   'game:action': (payload: GameAction) => void;
-  'chat:send': (payload: { text: string }) => void;
+  'chat:send': (payload: { text?: string; emote?: string }) => void;
 }
 
 export interface InterServerEvents {}
@@ -120,9 +120,10 @@ export interface GameEvent {
 // ─── Chat ─────────────────────────────────────
 export interface ChatMessage {
   id: string;
-  playerId: string;
-  playerName: string;
-  text: string;
+  senderId: string;
+  senderName: string;
+  text?: string;
+  emote?: string;
   timestamp: number;
 }
 

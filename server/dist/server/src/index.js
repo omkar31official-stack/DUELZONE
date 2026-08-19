@@ -14,12 +14,12 @@ const findMatch_1 = require("./games/findMatch");
 const PORT = parseInt(process.env.PORT ?? '3001', 10);
 const CLIENT_URL = process.env.CLIENT_URL ?? 'http://localhost:5173';
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)({ origin: [CLIENT_URL, 'http://localhost:5173', 'http://localhost:4173'], credentials: true }));
+app.use((0, cors_1.default)({ origin: true, credentials: true }));
 app.use(express_1.default.json());
 const httpServer = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        origin: [CLIENT_URL, 'http://localhost:5173', 'http://localhost:4173'],
+        origin: true,
         methods: ['GET', 'POST'],
         credentials: true,
     },

@@ -161,7 +161,7 @@ export function registerSocketHandlers(io: AppServer) {
     });
 
     // ─── Chat ──────────────────────────────────────────────────────────────
-    socket.on('chat:send', ({ text }) => {
+    socket.on('chat:send', ({ text, emote }) => {
       const playerId = socket.data.playerId;
       const roomCode = socket.data.roomCode;
       if (!playerId || !roomCode) return;
@@ -171,14 +171,15 @@ export function registerSocketHandlers(io: AppServer) {
       const player = room.players.find(p => p.id === playerId);
       if (!player) return;
 
-      const clean = text.trim().slice(0, MAX_CHAT_LENGTH);
-      if (!clean) return;
+      const clean = typeof text === 'string' ? text.trim().slice(0, MAX_CHAT_LENGTH) : '';
+      if (!clean && !emote) return;
 
       const msg: ChatMessage = {
         id: uuidv4(),
-        playerId,
-        playerName: player.name,
-        text: clean,
+        senderId: playerId,
+        senderName: player.name,
+        ...(clean ? { text: clean } : {}),
+        ...(emote ? { emote } : {}),
         timestamp: Date.now(),
       };
       io.to(roomCode).emit('chat:message', msg);

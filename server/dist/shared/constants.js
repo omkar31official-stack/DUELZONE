@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.COLOR_CLASH_WORDS = exports.COLOR_CLASH_COLORS = exports.FIND_MATCH_SYMBOL_COUNTS = exports.FIND_MATCH_SYMBOLS = exports.ALL_GAMES = exports.AVATAR_SEEDS = exports.ACCENT_COLORS = exports.FIND_MATCH_DEFAULT_ROUNDS = exports.RPS_WIN_SCORE = exports.REACTION_DUEL_ROUNDS = exports.QUICK_TAP_DURATION_MS = exports.MAX_PLAYER_NAME_LENGTH = exports.MAX_CHAT_LENGTH = exports.ROOM_EXPIRE_ONE_PLAYER_MS = exports.ROOM_EXPIRE_EMPTY_MS = exports.ROOM_CODE_LENGTH = void 0;
+exports.COLOR_CLASH_WORDS = exports.COLOR_CLASH_COLORS = exports.FIND_MATCH_SYMBOL_COUNTS = exports.FIND_MATCH_SYMBOLS = exports.ALL_GAMES = exports.AVATAR_SEEDS = exports.ACCENT_COLORS = exports.CHAT_EMOTES = exports.FIND_MATCH_DEFAULT_ROUNDS = exports.RPS_WIN_SCORE = exports.REACTION_DUEL_ROUNDS = exports.QUICK_TAP_DURATION_MS = exports.MAX_PLAYER_NAME_LENGTH = exports.MAX_CHAT_LENGTH = exports.ROOM_EXPIRE_ONE_PLAYER_MS = exports.ROOM_EXPIRE_EMPTY_MS = exports.ROOM_CODE_LENGTH = void 0;
 exports.ROOM_CODE_LENGTH = 6;
 exports.ROOM_EXPIRE_EMPTY_MS = 10 * 60 * 1000; // 10 min
 exports.ROOM_EXPIRE_ONE_PLAYER_MS = 60 * 1000; // 60 sec
@@ -10,6 +10,7 @@ exports.QUICK_TAP_DURATION_MS = 10000;
 exports.REACTION_DUEL_ROUNDS = 5;
 exports.RPS_WIN_SCORE = 5;
 exports.FIND_MATCH_DEFAULT_ROUNDS = 10;
+exports.CHAT_EMOTES = ['🔥', '😂', '👏', '🎯', '⚡', '💩', 'GG', '👑'];
 exports.ACCENT_COLORS = [
     '#FF6B6B', '#FF9F43', '#FFEAA7', '#55EFC4',
     '#74B9FF', '#A29BFE', '#FD79A8', '#00CEC9',
