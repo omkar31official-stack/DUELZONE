@@ -346,6 +346,17 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     icon: '🧩',
   },
   {
+    id: 'math-24',
+    name: 'Math 24',
+    description: 'Use the four numbers and basic math operations to reach exactly 24 before your opponents!',
+    category: 'MIND',
+    minPlayers: 1,
+    maxPlayers: 5,
+    estimatedMinutes: '3-8 min',
+    difficulty: 'Hard',
+    icon: '➗',
+  },
+  {
     id: 'chain-reaction',
     name: 'Chain Reaction',
     description: 'Place orbs to explode into neighbor cells. Wipe out the opponent!',

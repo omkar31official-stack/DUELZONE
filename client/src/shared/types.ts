@@ -32,7 +32,8 @@ export type GameId =
   | 'coop-puzzle'
   | 'water-sort'
   | 'sudoku'
-  | '2048';
+  | '2048'
+  | 'math-24';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -447,4 +448,16 @@ export interface Game2048State {
   completedAt: number | null;
   lastMoveByPlayer: string | null;
   lastMoveDirection: 'up' | 'down' | 'left' | 'right' | null;
+}
+
+export interface Math24State {
+  round: number;
+  totalRounds: number;
+  numbers: number[]; // 4 numbers to use
+  phase: 'countdown' | 'playing' | 'result';
+  roundWinner: string | null;
+  winningExpression: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  startedAt: number | null;
 }
