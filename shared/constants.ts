@@ -313,6 +313,17 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     icon: '🧩',
   },
   {
+    id: 'water-sort',
+    name: 'Water Sort',
+    description: 'Sort the colored liquids into the correct tubes!',
+    category: 'MIND',
+    minPlayers: 1,
+    maxPlayers: 5,
+    estimatedMinutes: '5-10 min',
+    difficulty: 'Hard',
+    icon: '🧪',
+  },
+  {
     id: 'chain-reaction',
     name: 'Chain Reaction',
     description: 'Place orbs to explode into neighbor cells. Wipe out the opponent!',

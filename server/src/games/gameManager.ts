@@ -27,6 +27,7 @@ import { createCornholeState, handleCornholeAction } from '../games/cornhole';
 import { createKnifeThrowerState, handleKnifeThrowerAction } from '../games/knifeThrower';
 import { createChainReactionState, handleChainReactionAction } from '../games/chainReaction';
 import { createCoopPuzzleState, handleCoopPuzzleAction } from '../games/coopPuzzle';
+import { createWaterSortState, handleWaterSortAction } from '../games/waterSort';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -126,6 +127,8 @@ export function createGameState(
       return { state: createChainReactionState(players) };
     case 'coop-puzzle':
       return { state: createCoopPuzzleState(players) };
+    case 'water-sort':
+      return { state: createWaterSortState(players) };
     default:
       return { state: null };
   }
@@ -195,6 +198,8 @@ export function handleGameAction(
       return handleChainReactionAction(currentState as any, playerId, action);
     case 'coop-puzzle':
       return handleCoopPuzzleAction(currentState as any, playerId, action);
+    case 'water-sort':
+      return handleWaterSortAction(currentState as any, playerId, action);
     default:
       return null;
   }

@@ -29,7 +29,8 @@ export type GameId =
   | 'fruit-ninja'
   | 'cornhole'
   | 'chain-reaction'
-  | 'coop-puzzle';
+  | 'coop-puzzle'
+  | 'water-sort';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -406,5 +407,16 @@ export interface CoopPuzzleState {
   startedAt: number | null;
   completedAt: number | null;
   selectedPieceIndex: number | null; // For selecting and swapping pieces
+  selectedByPlayer: string | null;
+}
+
+export interface WaterSortState {
+  phase: 'countdown' | 'playing' | 'result';
+  tubes: string[][]; // Array of tubes, where each tube is an array of color strings from bottom to top
+  tubeCapacity: number; // Max colors per tube (e.g., 4)
+  moves: number;
+  startedAt: number | null;
+  completedAt: number | null;
+  selectedTubeIndex: number | null;
   selectedByPlayer: string | null;
 }

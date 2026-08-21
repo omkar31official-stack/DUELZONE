@@ -1,7 +1,13 @@
 import { CoopPuzzleState } from '../../../shared/types';
 
-// Let's use a nice default image for the puzzle
-const DEFAULT_IMAGE_URL = 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=600&h=600';
+const PUZZLE_IMAGES = [
+  'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=600&h=600',
+  'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&q=80&w=600&h=600',
+  'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80&w=600&h=600',
+  'https://images.unsplash.com/photo-1506744626753-eda8151a1571?auto=format&fit=crop&q=80&w=600&h=600',
+  'https://images.unsplash.com/photo-1533450718592-29d45635f0a9?auto=format&fit=crop&q=80&w=600&h=600',
+  'https://images.unsplash.com/photo-1516117172878-fd2c41f4a759?auto=format&fit=crop&q=80&w=600&h=600',
+];
 
 export function createCoopPuzzleState(players: string[]): CoopPuzzleState {
   const gridSize = 3;
@@ -21,11 +27,13 @@ export function createCoopPuzzleState(players: string[]): CoopPuzzleState {
     isSorted = pieces.every((p, i) => p === i);
   }
 
+  const imageUrl = PUZZLE_IMAGES[Math.floor(Math.random() * PUZZLE_IMAGES.length)];
+
   return {
     phase: 'countdown',
     gridSize,
     pieces,
-    imageUrl: DEFAULT_IMAGE_URL,
+    imageUrl,
     moves: 0,
     startedAt: null,
     completedAt: null,
