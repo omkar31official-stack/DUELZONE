@@ -364,12 +364,26 @@ export function App() {
           )}
           {room.selectedGame === 'archery' && <ArcheryGame />}
           {room.selectedGame === 'bowling' && <BowlingGame />}
-          {room.selectedGame === 'hammer' && <HammerGame />}
+          {room.selectedGame === 'hammer' && (
+            <HammerGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
           {room.selectedGame === 'animal-balance' && <AnimalBalanceGame />}
           {room.selectedGame === 'ping-ball' && <PingBallGame />}
           {room.selectedGame === 'fruit-ninja' && <FruitNinjaGame />}
           {room.selectedGame === 'cornhole' && <CornholeGame />}
-          {room.selectedGame === 'knife-thrower' && <KnifeThrowerGame />}
+          {room.selectedGame === 'knife-thrower' && (
+            <KnifeThrowerGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
           {room.selectedGame === 'chain-reaction' && <ChainReactionGame />}
 
           {/* Winner Modal */}

@@ -177,7 +177,7 @@ export function handleGameAction(
     case 'bowling':
       return handleBowlingAction(currentState, playerId, action);
     case 'hammer':
-      return handleHammerAction(currentState, playerId, action);
+      return handleHammerAction(currentState as any, playerId, action);
     case 'animal-balance':
       return handleAnimalBalanceAction(currentState, playerId, action);
     case 'ping-ball':
@@ -187,7 +187,7 @@ export function handleGameAction(
     case 'cornhole':
       return handleCornholeAction(currentState, playerId, action);
     case 'knife-thrower':
-      return handleKnifeThrowerAction(currentState, playerId, action);
+      return handleKnifeThrowerAction(currentState as any, playerId, action);
     case 'chain-reaction':
       return handleChainReactionAction(currentState, playerId, action);
     default:
