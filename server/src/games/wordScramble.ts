@@ -3,18 +3,26 @@ import { WordScrambleState } from '../../../shared/types';
 const TOTAL_ROUNDS = 8;
 
 const WORD_BANK = [
-  'ALGORITHM', 'BINARY', 'COMPILE', 'DATABASE', 'ENCRYPT',
-  'FUNCTION', 'GRAPHIC', 'HASHTAG', 'INTEGER', 'JAVASCRIPT',
-  'KEYBOARD', 'LIBRARY', 'MALWARE', 'NETWORK', 'OPERATE',
-  'PROGRAM', 'QUANTUM', 'RUNTIME', 'SYNTAX', 'TERMINAL',
-  'UNICODE', 'VIRTUAL', 'WEBSITE', 'PYTHON', 'BROWSER',
-  'CLUSTER', 'DIGITAL', 'ELASTIC', 'FIREWALL', 'GATEWAY',
-  'HOSTING', 'INSTALL', 'JUPYTER', 'KERNEL', 'LOGGING',
-  'MACHINE', 'NEUTRAL', 'ORBITAL', 'PACKAGE', 'RESOLVE',
-  'STORAGE', 'TRACKER', 'UPGRADE', 'VOLTAGE', 'WEBPACK',
-  'CRYSTAL', 'DOLPHIN', 'ELEMENT', 'FORTUNE', 'GRAVITY',
-  'HARMONY', 'IMAGINE', 'JUSTICE', 'KITCHEN', 'LANTERN',
-  'MIRACLE', 'NATURAL', 'OCTAGON', 'PHOENIX', 'RAINBOW',
+  // Huge collection of programming/tech/logic words
+  'ALGORITHM', 'BINARY', 'COMPILE', 'DATABASE', 'ENCRYPT', 'FUNCTION', 'GRAPHIC', 'HASHTAG', 
+  'INTEGER', 'JAVASCRIPT', 'KEYBOARD', 'LIBRARY', 'MALWARE', 'NETWORK', 'OPERATE', 'PROGRAM', 
+  'QUANTUM', 'RUNTIME', 'SYNTAX', 'TERMINAL', 'UNICODE', 'VIRTUAL', 'WEBSITE', 'PYTHON', 
+  'BROWSER', 'CLUSTER', 'DIGITAL', 'ELASTIC', 'FIREWALL', 'GATEWAY', 'HOSTING', 'INSTALL', 
+  'JUPYTER', 'KERNEL', 'LOGGING', 'MACHINE', 'NEUTRAL', 'ORBITAL', 'PACKAGE', 'RESOLVE', 
+  'STORAGE', 'TRACKER', 'UPGRADE', 'VOLTAGE', 'WEBPACK', 'CRYSTAL', 'DOLPHIN', 'ELEMENT', 
+  'FORTUNE', 'GRAVITY', 'HARMONY', 'IMAGINE', 'JUSTICE', 'KITCHEN', 'LANTERN', 'MIRACLE', 
+  'NATURAL', 'OCTAGON', 'PHOENIX', 'RAINBOW', 'BACKEND', 'FRONTEND', 'TYPESCRIPT', 'NODEJS',
+  'FRAMEWORK', 'ASYNCHRONOUS', 'MIDDLEWARE', 'SERVERLESS', 'CONTAINER', 'DOCKER', 'KUBERNETES',
+  'VARIABLE', 'CONSTANT', 'PROMISE', 'CALLBACK', 'DEPENDENCY', 'INJECTION', 'INTERFACE',
+  'INHERITANCE', 'POLYMORPHISM', 'ENCAPSULATION', 'DEBUGGING', 'COMPILER', 'INTERPRETER',
+  'OPTIMIZATION', 'DEPLOYMENT', 'ARCHITECTURE', 'REPOSITORY', 'COMPONENT', 'RECURSION',
+  'ITERATION', 'VALIDATION', 'AUTHENTICATION', 'AUTHORIZATION', 'MICROSERVICE', 'MONOLITH',
+  'WEBSOCKET', 'PROTOCOL', 'BANDWIDTH', 'LATENCY', 'ROUTING', 'RENDERING', 'ANIMATION',
+  'VIBRATION', 'ACCELEROMETER', 'GYROSCOPE', 'BLUETOOTH', 'WIRELESS', 'ETHERNET', 'ROUTER',
+  'PROCESSOR', 'MOTHERBOARD', 'GRAPHICS', 'MEMORY', 'STORAGE', 'APPLICATION', 'SOFTWARE',
+  'HARDWARE', 'FIRMWARE', 'OPERATING', 'SYSTEM', 'MAINFRAME', 'SUPERCOMPUTER', 'MASTERY',
+  'SYMPHONY', 'UNIVERSE', 'GALAXY', 'ASTRONAUT', 'TELESCOPE', 'OBSERVATORY', 'METEORITE',
+  'ASTEROID', 'COMET', 'PLANET', 'SATELLITE', 'SPACECRAFT', 'ROCKET', 'LAUNCHPAD', 'ORBIT',
 ];
 
 function scrambleWord(word: string): string {
@@ -52,6 +60,7 @@ export function createWSState(playerIds: string[]): WordScrambleState {
     phase: 'playing',
     startedAt: Date.now(),
     hint: originalWord[0] + '...' + originalWord[originalWord.length - 1],
+    usedWords: [originalWord],
   };
 }
 
@@ -116,8 +125,15 @@ export function applyWSGuess(
 
 export function nextWSRound(state: WordScrambleState): WordScrambleState {
   const players = Object.keys(state.scores);
-  const wordIdx = Math.floor(Math.random() * WORD_BANK.length);
-  const originalWord = WORD_BANK[wordIdx];
+  
+  // Find a word not yet used
+  let originalWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
+  let attempts = 0;
+  while (state.usedWords.includes(originalWord) && attempts < 100) {
+    originalWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
+    attempts++;
+  }
+
   return {
     ...state,
     round: state.round + 1,
@@ -128,5 +144,6 @@ export function nextWSRound(state: WordScrambleState): WordScrambleState {
     phase: 'playing',
     startedAt: Date.now(),
     hint: originalWord[0] + '...' + originalWord[originalWord.length - 1],
+    usedWords: [...(state.usedWords || []), originalWord],
   };
 }

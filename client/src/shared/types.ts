@@ -320,6 +320,7 @@ export interface WordScrambleState {
   phase: 'playing' | 'result';
   startedAt: number | null;
   hint: string;
+  usedWords: string[];
 }
 
 // ─── Trivia Blitz ────────────────────────────
