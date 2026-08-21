@@ -102,28 +102,33 @@ export const SudokuGame: React.FC<Props> = ({ socket, state, currentPlayer, room
 
       {state.phase === 'playing' && (
         <div className="flex flex-col items-center w-full fade-in pb-4">
-          <div className="bg-slate-900 border-4 border-slate-700 rounded-lg p-1 shadow-2xl mb-6">
-            <div className="grid grid-cols-9 gap-[2px] bg-slate-700">
+          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-2 sm:p-3 shadow-[0_0_40px_rgba(0,0,0,0.5)] mb-8 relative">
+            
+            {/* Ambient Glow */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-cyan-500/10 rounded-2xl pointer-events-none" />
+
+            <div className="grid grid-cols-9 gap-[1px] bg-slate-700/50 rounded-xl overflow-hidden relative z-10">
               {state.board.map((row, r) => 
                 row.map((cell, c) => {
                   const isInitial = state.initialBoard[r][c];
                   const isSelected = selectedCell?.r === r && selectedCell?.c === c;
                   const isError = !isInitial && cell !== 0 && cell !== state.solution[r][c];
                   
-                  // Box borders
-                  const borderRight = c % 3 === 2 && c !== 8 ? 'border-r-2 border-r-slate-900' : '';
-                  const borderBottom = r % 3 === 2 && r !== 8 ? 'border-b-2 border-b-slate-900' : '';
+                  // Thicker borders for the 3x3 grids
+                  const borderRight = c % 3 === 2 && c !== 8 ? 'border-r-[3px] border-r-slate-800/80' : '';
+                  const borderBottom = r % 3 === 2 && r !== 8 ? 'border-b-[3px] border-b-slate-800/80' : '';
 
                   return (
                     <div
                       key={`${r}-${c}`}
                       onClick={() => handleCellClick(r, c)}
                       className={`
-                        w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold
+                        w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-black transition-all duration-200
                         ${borderRight} ${borderBottom}
-                        ${isInitial ? 'bg-slate-800 text-slate-300' : 'bg-slate-950 text-cyan-400 cursor-pointer hover:bg-slate-800 transition'}
-                        ${isSelected ? 'ring-inset ring-4 ring-cyan-500 bg-slate-800' : ''}
-                        ${isError ? 'text-rose-500 bg-rose-950/30' : ''}
+                        ${isInitial ? 'bg-slate-800/80 text-slate-300 shadow-inner' : 'bg-slate-900/90 text-cyan-400 cursor-pointer hover:bg-slate-800'}
+                        ${isSelected ? 'ring-inset ring-4 ring-cyan-400 bg-slate-700 shadow-[inset_0_0_15px_rgba(34,211,238,0.3)] z-10' : ''}
+                        ${isError ? 'text-rose-500 bg-rose-950/60 shadow-[inset_0_0_15px_rgba(244,63,94,0.3)]' : ''}
+                        ${!isInitial && cell !== 0 && !isError ? 'drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]' : ''}
                       `}
                     >
                       {cell !== 0 ? cell : ''}
