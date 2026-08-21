@@ -89,7 +89,28 @@ export function applyWSGuess(
     };
   }
 
-  // Wrong guess — just record it, no penalty
+  // Wrong guess
+  const allGuessed = Object.keys(state.scores).every(id => guesses[id] !== null);
+  
+  if (allGuessed) {
+    // Everyone guessed wrong
+    const gameWinner = state.round >= TOTAL_ROUNDS
+      ? (() => {
+          const ranked = Object.entries(state.scores).sort((a, b) => b[1] - a[1]);
+          return ranked.length > 1 && ranked[0][1] === ranked[1][1] ? null : ranked[0]?.[0] ?? null;
+        })()
+      : null;
+
+    return {
+      ...state,
+      guesses,
+      roundWinner: null,
+      phase: 'result',
+      gameWinner,
+    };
+  }
+
+  // Still waiting for others
   return { ...state, guesses };
 }
 
