@@ -5,6 +5,7 @@ export const ROOM_EXPIRE_EMPTY_MS = 10 * 60 * 1000;      // 10 min
 export const ROOM_EXPIRE_ONE_PLAYER_MS = 60 * 1000;      // 60 sec
 export const MAX_CHAT_LENGTH = 120;
 export const MAX_PLAYER_NAME_LENGTH = 16;
+export const MAX_ROOM_PLAYERS = 5;
 export const QUICK_TAP_DURATION_MS = 10_000;
 export const REACTION_DUEL_ROUNDS = 5;
 export const RPS_WIN_SCORE = 5;
@@ -134,6 +135,72 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     estimatedMinutes: '4-7 min',
     difficulty: 'Medium',
     icon: '⬜',
+  },
+  {
+    id: 'tap-royale',
+    name: 'Tap Royale',
+    description: 'A 10-second button-mashing arena for up to five players.',
+    category: 'PARTY',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '1 min',
+    difficulty: 'Easy',
+    icon: '👑',
+  },
+  {
+    id: 'target-rush',
+    name: 'Target Rush',
+    description: 'Everyone picks the number closest to the target. Best score wins.',
+    category: 'PARTY',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '2-3 min',
+    difficulty: 'Medium',
+    icon: '🎯',
+  },
+  {
+    id: 'word-scramble',
+    name: 'Word Scramble',
+    description: 'Unscramble the letters to form the correct word first!',
+    category: 'MIND',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '3-5 min',
+    difficulty: 'Medium',
+    icon: '🔤',
+  },
+  {
+    id: 'trivia-blitz',
+    name: 'Trivia Blitz',
+    description: 'Answer rapid-fire trivia questions faster than your rivals!',
+    category: 'MIND',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '3-5 min',
+    difficulty: 'Medium',
+    icon: '🧠',
+  },
+  {
+    id: 'speed-math',
+    name: 'Speed Math',
+    description: 'Solve mental math equations faster than everyone else!',
+    category: 'MIND',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '2-4 min',
+    difficulty: 'Medium',
+    icon: '➕',
+  },
+  {
+    id: 'pattern-master',
+    name: 'Pattern Master',
+    description: 'Memorize and repeat the glowing sequence pattern!',
+    category: 'MIND',
+    minPlayers: 2,
+    maxPlayers: 5,
+    estimatedMinutes: '3-5 min',
+    difficulty: 'Hard',
+    icon: '🧩',
   },
 ];
 

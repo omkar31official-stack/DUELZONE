@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.COLOR_CLASH_WORDS = exports.COLOR_CLASH_COLORS = exports.FIND_MATCH_SYMBOL_COUNTS = exports.FIND_MATCH_SYMBOLS = exports.ALL_GAMES = exports.AVATAR_SEEDS = exports.ACCENT_COLORS = exports.CHAT_EMOTES = exports.FIND_MATCH_DEFAULT_ROUNDS = exports.RPS_WIN_SCORE = exports.REACTION_DUEL_ROUNDS = exports.QUICK_TAP_DURATION_MS = exports.MAX_PLAYER_NAME_LENGTH = exports.MAX_CHAT_LENGTH = exports.ROOM_EXPIRE_ONE_PLAYER_MS = exports.ROOM_EXPIRE_EMPTY_MS = exports.ROOM_CODE_LENGTH = void 0;
+exports.COLOR_CLASH_WORDS = exports.COLOR_CLASH_COLORS = exports.FIND_MATCH_SYMBOL_COUNTS = exports.FIND_MATCH_SYMBOLS = exports.ALL_GAMES = exports.AVATAR_SEEDS = exports.ACCENT_COLORS = exports.CHAT_EMOTES = exports.FIND_MATCH_DEFAULT_ROUNDS = exports.RPS_WIN_SCORE = exports.REACTION_DUEL_ROUNDS = exports.QUICK_TAP_DURATION_MS = exports.MAX_ROOM_PLAYERS = exports.MAX_PLAYER_NAME_LENGTH = exports.MAX_CHAT_LENGTH = exports.ROOM_EXPIRE_ONE_PLAYER_MS = exports.ROOM_EXPIRE_EMPTY_MS = exports.ROOM_CODE_LENGTH = void 0;
 exports.ROOM_CODE_LENGTH = 6;
 exports.ROOM_EXPIRE_EMPTY_MS = 10 * 60 * 1000; // 10 min
 exports.ROOM_EXPIRE_ONE_PLAYER_MS = 60 * 1000; // 60 sec
 exports.MAX_CHAT_LENGTH = 120;
 exports.MAX_PLAYER_NAME_LENGTH = 16;
+exports.MAX_ROOM_PLAYERS = 5;
 exports.QUICK_TAP_DURATION_MS = 10000;
 exports.REACTION_DUEL_ROUNDS = 5;
 exports.RPS_WIN_SCORE = 5;
@@ -131,6 +132,28 @@ exports.ALL_GAMES = [
         estimatedMinutes: '4-7 min',
         difficulty: 'Medium',
         icon: '⬜',
+    },
+    {
+        id: 'tap-royale',
+        name: 'Tap Royale',
+        description: 'A 10-second button-mashing arena for up to five players.',
+        category: 'PARTY',
+        minPlayers: 2,
+        maxPlayers: 5,
+        estimatedMinutes: '1 min',
+        difficulty: 'Easy',
+        icon: '👑',
+    },
+    {
+        id: 'target-rush',
+        name: 'Target Rush',
+        description: 'Everyone picks the number closest to the target. Best score wins.',
+        category: 'PARTY',
+        minPlayers: 2,
+        maxPlayers: 5,
+        estimatedMinutes: '2-3 min',
+        difficulty: 'Medium',
+        icon: '🎯',
     },
 ];
 exports.FIND_MATCH_SYMBOLS = [

@@ -12,9 +12,15 @@ export type GameId =
   | 'memory-duel'
   | 'number-battle'
   | 'color-clash'
-  | 'dots-and-boxes';
+  | 'dots-and-boxes'
+  | 'tap-royale'
+  | 'target-rush'
+  | 'word-scramble'
+  | 'trivia-blitz'
+  | 'speed-math'
+  | 'pattern-master';
 
-export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK';
+export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
 export interface GameDefinitionMeta {
   id: GameId;
@@ -64,6 +70,9 @@ export interface ServerToClientEvents {
   'chat:message': (msg: ChatMessage) => void;
   'player:reconnected': (playerId: string) => void;
   'room:closed': (reason: string) => void;
+  'webrtc:offer': (payload: { senderId: string; offer: unknown }) => void;
+  'webrtc:answer': (payload: { senderId: string; answer: unknown }) => void;
+  'webrtc:ice-candidate': (payload: { senderId: string; candidate: unknown }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -75,6 +84,9 @@ export interface ClientToServerEvents {
   'room:returnToLobby': () => void;
   'game:action': (payload: GameAction) => void;
   'chat:send': (payload: { text?: string; emote?: string }) => void;
+  'webrtc:offer': (payload: { targetId: string; offer: unknown }) => void;
+  'webrtc:answer': (payload: { targetId: string; answer: unknown }) => void;
+  'webrtc:ice-candidate': (payload: { targetId: string; candidate: unknown }) => void;
 }
 
 export interface InterServerEvents {}
@@ -259,4 +271,94 @@ export interface DotsAndBoxesState {
   scores: Record<string, number>;
   winner: string | null;
   isDone: boolean;
+}
+
+// ─── Tap Royale ──────────────────────────────
+export interface TapRoyaleState {
+  phase: 'countdown' | 'playing' | 'result';
+  startTime: number | null;
+  endTime: number | null;
+  tapCounts: Record<string, number>;
+  winner: string | null;
+}
+
+// ─── Target Rush ─────────────────────────────
+export interface TargetRushState {
+  round: number;
+  totalRounds: number;
+  target: number;
+  playerNumbers: Record<string, number[]>;
+  choices: Record<string, number | null>;
+  revealed: boolean;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+}
+
+// ─── Word Scramble ───────────────────────────
+export interface WordScrambleState {
+  round: number;
+  totalRounds: number;
+  scrambledWord: string;
+  originalWord: string;
+  guesses: Record<string, string | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'playing' | 'result';
+  startedAt: number | null;
+  hint: string;
+}
+
+// ─── Trivia Blitz ────────────────────────────
+export interface TriviaQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface TriviaBlitzState {
+  round: number;
+  totalRounds: number;
+  currentQuestion: TriviaQuestion;
+  remainingQuestions: TriviaQuestion[];
+  answers: Record<string, number | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'playing' | 'result';
+  startedAt: number | null;
+}
+
+// ─── Speed Math ──────────────────────────────
+export interface SpeedMathProblem {
+  equation: string;
+  options: number[];
+  correctAnswer: number;
+}
+
+export interface SpeedMathState {
+  round: number;
+  totalRounds: number;
+  currentProblem: SpeedMathProblem;
+  answers: Record<string, number | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'playing' | 'result';
+  startedAt: number | null;
+}
+
+// ─── Pattern Master ──────────────────────────
+export interface PatternMasterState {
+  round: number;
+  totalRounds: number;
+  sequence: number[]; // e.g. [0, 2, 1, 3]
+  playerInputs: Record<string, number[]>;
+  failedPlayers: string[];
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'showing' | 'input' | 'result';
+  startedAt: number | null;
 }

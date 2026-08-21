@@ -5,7 +5,7 @@ import {
 } from '../../../shared/types';
 import {
   ACCENT_COLORS, AVATAR_SEEDS, ROOM_CODE_LENGTH,
-  ROOM_EXPIRE_EMPTY_MS, ROOM_EXPIRE_ONE_PLAYER_MS, MAX_PLAYER_NAME_LENGTH,
+  ROOM_EXPIRE_EMPTY_MS, ROOM_EXPIRE_ONE_PLAYER_MS, MAX_PLAYER_NAME_LENGTH, MAX_ROOM_PLAYERS,
 } from '../../../shared/constants';
 
 // ─── In-memory store (Redis-ready interface) ─────────────────────────────────
@@ -75,7 +75,7 @@ export function joinRoom(code: string, playerName: string, socketId: string): { 
   if (!room) return { error: 'Room not found.' };
 
   const connected = room.players.filter(p => p.isConnected);
-  if (connected.length >= 2) return { error: 'This room is already full.' };
+  if (connected.length >= MAX_ROOM_PLAYERS) return { error: 'This room is already full.' };
   if (room.status === 'playing') return { error: 'A game is already in progress.' };
 
   // Check if this is a reconnect (same name, disconnected slot)
@@ -90,7 +90,7 @@ export function joinRoom(code: string, playerName: string, socketId: string): { 
   const player: Player = {
     id: uuidv4(),
     socketId,
-    name: sanitizeName(playerName) || 'Player2',
+    name: sanitizeName(playerName) || `Player${room.players.length + 1}`,
     avatarSeed: randomElement(AVATAR_SEEDS),
     accentColor: randomElement(ACCENT_COLORS),
     isHost: false,
@@ -99,7 +99,7 @@ export function joinRoom(code: string, playerName: string, socketId: string): { 
   };
 
   room.players.push(player);
-  if (room.players.length === 2) room.status = 'lobby';
+  if (room.players.length >= 2) room.status = 'lobby';
   room.lastActivity = Date.now();
   return { room, player };
 }

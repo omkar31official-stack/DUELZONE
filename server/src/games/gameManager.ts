@@ -1,6 +1,6 @@
 import { GameId, GameAction } from '../../../shared/types';
 import { FIND_MATCH_DEFAULT_ROUNDS } from '../../../shared/constants';
-import { generateFindMatchRound } from '../games/findMatch';
+import { generateFindMatchRound, isOnCooldown, clearClickCooldowns } from '../games/findMatch';
 import { createTTTState, applyTTTMove, resetTTTBoard } from '../games/ticTacToe';
 import { createC4State, applyC4Move, resetC4 } from '../games/connectFour';
 import { createRPSState, applyRPSChoice, nextRPSRound } from '../games/rockPaperScissors';
@@ -10,10 +10,20 @@ import { createMDState, applyMDFlip } from '../games/memoryDuel';
 import { createNBState, applyNBChoice, nextNBRound } from '../games/numberBattle';
 import { createCCState, applyCCChoice, nextCCRound } from '../games/colorClash';
 import { createDABState, applyDABEdge } from '../games/dotsAndBoxes';
+import { createTapRoyaleState, startTapRoyale, applyTapRoyaleTap, finishTapRoyale } from '../games/tapRoyale';
+import { createTargetRushState, applyTargetRushChoice, nextTargetRushRound } from '../games/targetRush';
+import { createWSState, applyWSGuess, nextWSRound } from '../games/wordScramble';
+import { createTBState, applyTBAnswer, nextTBRound } from '../games/triviaBlitz';
+import { createSpeedMathState, applySpeedMathAnswer, nextSpeedMathRound } from '../games/speedMath';
+import { createPatternMasterState, applyPatternInput, nextPatternRound } from '../games/patternMaster';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
-type Players = [string, string]; // [p1Id, p2Id]
+type Players = string[];
+
+function asDuelPlayers(players: Players): [string, string] {
+  return [players[0], players[1]];
+}
 
 // Timer registry for automated round transitions
 const gameTimers = new Map<string, ReturnType<typeof setTimeout>[]>();
@@ -27,6 +37,7 @@ export function clearGameTimers(roomCode: string) {
   const timers = gameTimers.get(roomCode) || [];
   timers.forEach(clearTimeout);
   gameTimers.delete(roomCode);
+  clearClickCooldowns(roomCode);
 }
 
 export interface GameHandlerResult {
@@ -52,23 +63,35 @@ export function createGameState(
       return { state };
     }
     case 'tic-tac-toe':
-      return { state: createTTTState(players) };
+      return { state: createTTTState(asDuelPlayers(players)) };
     case 'connect-four':
-      return { state: createC4State(players) };
+      return { state: createC4State(asDuelPlayers(players)) };
     case 'rock-paper-scissors':
-      return { state: createRPSState(players) };
+      return { state: createRPSState(asDuelPlayers(players)) };
     case 'reaction-duel':
-      return { state: createRDState(players) };
+      return { state: createRDState(asDuelPlayers(players)) };
     case 'quick-tap':
-      return { state: createQTState(players) };
+      return { state: createQTState(asDuelPlayers(players)) };
     case 'memory-duel':
-      return { state: createMDState(players) };
+      return { state: createMDState(asDuelPlayers(players)) };
     case 'number-battle':
-      return { state: createNBState(players) };
+      return { state: createNBState(asDuelPlayers(players)) };
     case 'color-clash':
-      return { state: createCCState(players) };
+      return { state: createCCState(asDuelPlayers(players)) };
     case 'dots-and-boxes':
-      return { state: createDABState(players) };
+      return { state: createDABState(asDuelPlayers(players)) };
+    case 'tap-royale':
+      return { state: createTapRoyaleState(players) };
+    case 'target-rush':
+      return { state: createTargetRushState(players) };
+    case 'word-scramble':
+      return { state: createWSState(players) };
+    case 'trivia-blitz':
+      return { state: createTBState(players) };
+    case 'speed-math':
+      return { state: createSpeedMathState(players) };
+    case 'pattern-master':
+      return { state: createPatternMasterState(players) };
     default:
       return { state: null };
   }
@@ -104,6 +127,18 @@ export function handleGameAction(
       return handleCCAction(currentState, playerId, action, broadcastFn);
     case 'dots-and-boxes':
       return handleDABAction(currentState, playerId, action);
+    case 'tap-royale':
+      return handleTapRoyaleAction(currentState, playerId, action);
+    case 'target-rush':
+      return handleTargetRushAction(currentState, playerId, action, broadcastFn);
+    case 'word-scramble':
+      return handleWSAction(currentState, playerId, action, broadcastFn);
+    case 'trivia-blitz':
+      return handleTBAction(currentState, playerId, action, broadcastFn);
+    case 'speed-math':
+      return handleSpeedMathAction(currentState, playerId, action, broadcastFn);
+    case 'pattern-master':
+      return handlePatternMasterAction(currentState, playerId, action, roomCode, broadcastFn);
     default:
       return null;
   }
@@ -135,19 +170,53 @@ function handleFindMatchAction(
     const symbolId = (action.payload as { symbolId: string })?.symbolId;
     if (!symbolId) return null;
 
-    // Validate: is the symbol on this player's board?
-    const isP1 = state.player1Symbols.some(s => s.id === playerId && s.id === symbolId) ||
-                  (Object.keys(state.scores)[0] === playerId && state.player1Symbols.some(s => s.id === symbolId));
-    // More precise: identify which player slot
+    // Anti-spam: server-side click cooldown
+    if (isOnCooldown(roomCode, playerId)) return null;
+
+    // Identify which player slot
     const playerKeys = Object.keys(state.scores);
     const playerIndex = playerKeys.indexOf(playerId);
+    if (playerIndex === -1) return null;
     const mySymbols = playerIndex === 0 ? state.player1Symbols : state.player2Symbols;
     if (!mySymbols.some(s => s.id === symbolId)) return null;
 
     // Is it the common symbol?
     if (symbolId !== state.commonSymbolId) {
-      // Wrong! No penalty in basic mode
-      return null;
+      // WRONG CLICK! Award 1 point to the opponent as penalty
+      const opponentId = playerKeys.find(p => p !== playerId)!;
+      const scores = { ...state.scores, [opponentId]: (state.scores[opponentId] || 0) + 1 };
+      const penaltyState: FindMatchRoundState = { ...state, scores, winner: opponentId, phase: 'result' };
+      broadcast(penaltyState, { type: 'WRONG_CLICK', payload: { playerId, opponentId, symbolId } });
+
+      const newRound = state.round + 1;
+      const isGameOver = newRound > state.totalRounds;
+
+      if (!isGameOver) {
+        const t = setTimeout(() => {
+          const next = generateFindMatchRound(newRound, state.totalRounds, scores, state.difficulty);
+          const nextState: FindMatchRoundState = {
+            ...next,
+            startedAt: null,
+            phase: 'countdown',
+            winner: null,
+          };
+          broadcast(nextState);
+          const t2 = setTimeout(() => {
+            broadcast({ ...nextState, phase: 'playing', startedAt: Date.now() }, { type: 'ROUND_GO' });
+          }, 3000);
+          addTimer(roomCode, t2);
+        }, 2500);
+        addTimer(roomCode, t);
+      } else {
+        const [p1, p2] = playerKeys;
+        const gameWinner = scores[p1] > scores[p2] ? p1 : scores[p2] > scores[p1] ? p2 : null;
+        const t = setTimeout(() => {
+          broadcast({ ...penaltyState, phase: 'result' }, { type: 'GAME_OVER', payload: { winner: gameWinner, scores } });
+        }, 2500);
+        addTimer(roomCode, t);
+      }
+
+      return penaltyState;
     }
 
     // Correct! Player wins round
@@ -351,6 +420,127 @@ function handleDABAction(state: GameState, playerId: string, action: GameAction)
   if (action.type === 'DRAW_EDGE') {
     const { type, row, col } = action.payload as { type: 'h' | 'v'; row: number; col: number };
     return applyDABEdge(state as any, playerId, type, row, col);
+  }
+  return null;
+}
+
+// ─── Tap Royale ──────────────────────────────────────────────────────────────
+function handleTapRoyaleAction(state: GameState, playerId: string, action: GameAction): GameState | null {
+  const s = state as any;
+  if (action.type === 'START') {
+    return startTapRoyale(s);
+  }
+  if (action.type === 'TAP') {
+    const result = applyTapRoyaleTap(s, playerId, Date.now());
+    if (!result) return null;
+    if (result.endTime && Date.now() >= result.endTime) return finishTapRoyale(result);
+    return result;
+  }
+  if (action.type === 'FINISH') {
+    return finishTapRoyale(s);
+  }
+  return null;
+}
+
+// ─── Target Rush ─────────────────────────────────────────────────────────────
+function handleTargetRushAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  if (action.type === 'CHOOSE') {
+    const number = (action.payload as { number: number })?.number;
+    const result = applyTargetRushChoice(state as any, playerId, number);
+    if (!result) return null;
+    if (result.revealed && !result.gameWinner) {
+      setTimeout(() => broadcast(nextTargetRushRound(result)), 2500);
+    }
+    return result;
+  }
+  return null;
+}
+
+// ─── Word Scramble ───────────────────────────────────────────────────────────
+function handleWSAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  if (action.type === 'GUESS') {
+    const guess = (action.payload as { guess: string })?.guess;
+    if (!guess || typeof guess !== 'string') return null;
+    const result = applyWSGuess(state as any, playerId, guess);
+    if (!result) return null;
+    if (result.phase === 'result' && !result.gameWinner) {
+      setTimeout(() => broadcast(nextWSRound(result)), 2500);
+    }
+    return result;
+  }
+  return null;
+}
+
+// ─── Trivia Blitz ────────────────────────────────────────────────────────────
+function handleTBAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  if (action.type === 'ANSWER') {
+    const answerIndex = (action.payload as { answerIndex: number })?.answerIndex;
+    if (typeof answerIndex !== 'number') return null;
+    const result = applyTBAnswer(state as any, playerId, answerIndex);
+    if (!result) return null;
+    if (result.phase === 'result' && !result.gameWinner) {
+      setTimeout(() => broadcast(nextTBRound(result)), 2500);
+    }
+    return result;
+  }
+  return null;
+}
+// ─── Speed Math ──────────────────────────────────────────────────────────────
+function handleSpeedMathAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  if (action.type === 'ANSWER') {
+    const chosenVal = (action.payload as { chosenVal: number })?.chosenVal;
+    if (typeof chosenVal !== 'number') return null;
+    const result = applySpeedMathAnswer(state as any, playerId, chosenVal);
+    if (!result) return null;
+    if (result.phase === 'result' && !result.gameWinner) {
+      setTimeout(() => broadcast(nextSpeedMathRound(result)), 2500);
+    }
+    return result;
+  }
+  return null;
+}
+
+// ─── Pattern Master ──────────────────────────────────────────────────────────
+function handlePatternMasterAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  roomCode: string,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  const s = state as any;
+  if (action.type === 'SHOW_COMPLETE') {
+    return { ...s, phase: 'input' };
+  }
+  if (action.type === 'INPUT') {
+    const padIndex = (action.payload as { padIndex: number })?.padIndex;
+    if (typeof padIndex !== 'number') return null;
+    const result = applyPatternInput(s, playerId, padIndex);
+    if (!result) return null;
+    if (result.phase === 'result' && !result.gameWinner) {
+      setTimeout(() => broadcast(nextPatternRound(result)), 2500);
+    }
+    return result;
   }
   return null;
 }

@@ -76,7 +76,7 @@ function joinRoom(code, playerName, socketId) {
     if (!room)
         return { error: 'Room not found.' };
     const connected = room.players.filter(p => p.isConnected);
-    if (connected.length >= 2)
+    if (connected.length >= constants_1.MAX_ROOM_PLAYERS)
         return { error: 'This room is already full.' };
     if (room.status === 'playing')
         return { error: 'A game is already in progress.' };
@@ -91,7 +91,7 @@ function joinRoom(code, playerName, socketId) {
     const player = {
         id: (0, uuid_1.v4)(),
         socketId,
-        name: sanitizeName(playerName) || 'Player2',
+        name: sanitizeName(playerName) || `Player${room.players.length + 1}`,
         avatarSeed: randomElement(constants_1.AVATAR_SEEDS),
         accentColor: randomElement(constants_1.ACCENT_COLORS),
         isHost: false,
@@ -99,7 +99,7 @@ function joinRoom(code, playerName, socketId) {
         gamesWon: 0,
     };
     room.players.push(player);
-    if (room.players.length === 2)
+    if (room.players.length >= 2)
         room.status = 'lobby';
     room.lastActivity = Date.now();
     return { room, player };

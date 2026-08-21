@@ -118,10 +118,16 @@ function registerSocketHandlers(io) {
                 return;
             if (!room.selectedGame)
                 return;
-            if (room.players.filter(p => p.isConnected).length < 2)
+            const gameMeta = constants_1.ALL_GAMES.find(game => game.id === room.selectedGame);
+            const connectedPlayers = room.players.filter(p => p.isConnected);
+            if (!gameMeta)
                 return;
+            if (connectedPlayers.length < gameMeta.minPlayers || connectedPlayers.length > gameMeta.maxPlayers) {
+                socket.emit('room:error', `${gameMeta.name} needs ${gameMeta.minPlayers === gameMeta.maxPlayers ? gameMeta.minPlayers : `${gameMeta.minPlayers}-${gameMeta.maxPlayers}`} players.`);
+                return;
+            }
             (0, gameManager_1.clearGameTimers)(roomCode);
-            const playerIds = room.players.map(p => p.id);
+            const playerIds = connectedPlayers.map(p => p.id);
             const { state } = (0, gameManager_1.createGameState)(room.selectedGame, playerIds);
             RM.setGameState(roomCode, state);
             const snap = RM.snapshot(room);

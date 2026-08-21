@@ -14,6 +14,11 @@ const memoryDuel_1 = require("../games/memoryDuel");
 const numberBattle_1 = require("../games/numberBattle");
 const colorClash_1 = require("../games/colorClash");
 const dotsAndBoxes_1 = require("../games/dotsAndBoxes");
+const tapRoyale_1 = require("../games/tapRoyale");
+const targetRush_1 = require("../games/targetRush");
+function asDuelPlayers(players) {
+    return [players[0], players[1]];
+}
 // Timer registry for automated round transitions
 const gameTimers = new Map();
 function addTimer(roomCode, t) {
@@ -41,23 +46,27 @@ function createGameState(gameId, players) {
             return { state };
         }
         case 'tic-tac-toe':
-            return { state: (0, ticTacToe_1.createTTTState)(players) };
+            return { state: (0, ticTacToe_1.createTTTState)(asDuelPlayers(players)) };
         case 'connect-four':
-            return { state: (0, connectFour_1.createC4State)(players) };
+            return { state: (0, connectFour_1.createC4State)(asDuelPlayers(players)) };
         case 'rock-paper-scissors':
-            return { state: (0, rockPaperScissors_1.createRPSState)(players) };
+            return { state: (0, rockPaperScissors_1.createRPSState)(asDuelPlayers(players)) };
         case 'reaction-duel':
-            return { state: (0, reactionDuel_1.createRDState)(players) };
+            return { state: (0, reactionDuel_1.createRDState)(asDuelPlayers(players)) };
         case 'quick-tap':
-            return { state: (0, quickTap_1.createQTState)(players) };
+            return { state: (0, quickTap_1.createQTState)(asDuelPlayers(players)) };
         case 'memory-duel':
-            return { state: (0, memoryDuel_1.createMDState)(players) };
+            return { state: (0, memoryDuel_1.createMDState)(asDuelPlayers(players)) };
         case 'number-battle':
-            return { state: (0, numberBattle_1.createNBState)(players) };
+            return { state: (0, numberBattle_1.createNBState)(asDuelPlayers(players)) };
         case 'color-clash':
-            return { state: (0, colorClash_1.createCCState)(players) };
+            return { state: (0, colorClash_1.createCCState)(asDuelPlayers(players)) };
         case 'dots-and-boxes':
-            return { state: (0, dotsAndBoxes_1.createDABState)(players) };
+            return { state: (0, dotsAndBoxes_1.createDABState)(asDuelPlayers(players)) };
+        case 'tap-royale':
+            return { state: (0, tapRoyale_1.createTapRoyaleState)(players) };
+        case 'target-rush':
+            return { state: (0, targetRush_1.createTargetRushState)(players) };
         default:
             return { state: null };
     }
@@ -85,6 +94,10 @@ function handleGameAction(gameId, currentState, playerId, action, roomCode, broa
             return handleCCAction(currentState, playerId, action, broadcastFn);
         case 'dots-and-boxes':
             return handleDABAction(currentState, playerId, action);
+        case 'tap-royale':
+            return handleTapRoyaleAction(currentState, playerId, action);
+        case 'target-rush':
+            return handleTargetRushAction(currentState, playerId, action, broadcastFn);
         default:
             return null;
     }
@@ -299,6 +312,39 @@ function handleDABAction(state, playerId, action) {
     if (action.type === 'DRAW_EDGE') {
         const { type, row, col } = action.payload;
         return (0, dotsAndBoxes_1.applyDABEdge)(state, playerId, type, row, col);
+    }
+    return null;
+}
+// ─── Tap Royale ──────────────────────────────────────────────────────────────
+function handleTapRoyaleAction(state, playerId, action) {
+    const s = state;
+    if (action.type === 'START') {
+        return (0, tapRoyale_1.startTapRoyale)(s);
+    }
+    if (action.type === 'TAP') {
+        const result = (0, tapRoyale_1.applyTapRoyaleTap)(s, playerId, Date.now());
+        if (!result)
+            return null;
+        if (result.endTime && Date.now() >= result.endTime)
+            return (0, tapRoyale_1.finishTapRoyale)(result);
+        return result;
+    }
+    if (action.type === 'FINISH') {
+        return (0, tapRoyale_1.finishTapRoyale)(s);
+    }
+    return null;
+}
+// ─── Target Rush ─────────────────────────────────────────────────────────────
+function handleTargetRushAction(state, playerId, action, broadcast) {
+    if (action.type === 'CHOOSE') {
+        const number = action.payload?.number;
+        const result = (0, targetRush_1.applyTargetRushChoice)(state, playerId, number);
+        if (!result)
+            return null;
+        if (result.revealed && !result.gameWinner) {
+            setTimeout(() => broadcast((0, targetRush_1.nextTargetRushRound)(result)), 2500);
+        }
+        return result;
     }
     return null;
 }

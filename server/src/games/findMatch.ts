@@ -15,6 +15,29 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// Server-side cooldown map: roomCode -> { playerId -> lastClickTimestamp }
+const clickCooldowns = new Map<string, Record<string, number>>();
+
+const CLICK_COOLDOWN_MS = 350; // minimum ms between clicks per player
+
+export function getClickCooldownMap(roomCode: string): Record<string, number> {
+  if (!clickCooldowns.has(roomCode)) clickCooldowns.set(roomCode, {});
+  return clickCooldowns.get(roomCode)!;
+}
+
+export function clearClickCooldowns(roomCode: string) {
+  clickCooldowns.delete(roomCode);
+}
+
+export function isOnCooldown(roomCode: string, playerId: string): boolean {
+  const map = getClickCooldownMap(roomCode);
+  const last = map[playerId] || 0;
+  const now = Date.now();
+  if (now - last < CLICK_COOLDOWN_MS) return true;
+  map[playerId] = now;
+  return false;
+}
+
 /** Generate a single Find Match round with EXACTLY one common symbol */
 export function generateFindMatchRound(
   round: number,

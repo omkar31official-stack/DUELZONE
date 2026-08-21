@@ -7,7 +7,7 @@ import {
   GameId,
   ChatMessage,
 } from '../../../shared/types';
-import { MAX_CHAT_LENGTH } from '../../../shared/constants';
+import { ALL_GAMES, MAX_CHAT_LENGTH } from '../../../shared/constants';
 import * as RM from '../rooms/roomManager';
 import { createGameState, handleGameAction, clearGameTimers } from '../games/gameManager';
 import { v4 as uuidv4 } from 'uuid';
@@ -95,11 +95,20 @@ export function registerSocketHandlers(io: AppServer) {
       const player = room.players.find(p => p.id === playerId);
       if (!player?.isHost) return;
       if (!room.selectedGame) return;
-      if (room.players.filter(p => p.isConnected).length < 2) return;
+      const gameMeta = ALL_GAMES.find(game => game.id === room.selectedGame);
+      const connectedPlayers = room.players.filter(p => p.isConnected);
+      if (!gameMeta) return;
+      if (connectedPlayers.length < gameMeta.minPlayers || connectedPlayers.length > gameMeta.maxPlayers) {
+        socket.emit(
+          'room:error',
+          `${gameMeta.name} needs ${gameMeta.minPlayers === gameMeta.maxPlayers ? gameMeta.minPlayers : `${gameMeta.minPlayers}-${gameMeta.maxPlayers}`} players.`,
+        );
+        return;
+      }
 
       clearGameTimers(roomCode);
 
-      const playerIds = room.players.map(p => p.id) as [string, string];
+      const playerIds = connectedPlayers.map(p => p.id);
       const { state } = createGameState(room.selectedGame, playerIds);
       RM.setGameState(roomCode, state);
 
@@ -200,5 +209,34 @@ export function registerSocketHandlers(io: AppServer) {
         io.to(room.code).emit('room:closed', 'All players left.');
       }
     });
+
+    // ─── WebRTC Voice Chat Signaling ───────────────────────────────────────
+    socket.on('webrtc:offer', ({ targetId, offer }) => {
+      const room = RM.getRoom(socket.data.roomCode!);
+      if (!room) return;
+      const target = room.players.find(p => p.id === targetId);
+      if (target?.isConnected) {
+        io.to(target.socketId).emit('webrtc:offer', { senderId: socket.data.playerId!, offer });
+      }
+    });
+
+    socket.on('webrtc:answer', ({ targetId, answer }) => {
+      const room = RM.getRoom(socket.data.roomCode!);
+      if (!room) return;
+      const target = room.players.find(p => p.id === targetId);
+      if (target?.isConnected) {
+        io.to(target.socketId).emit('webrtc:answer', { senderId: socket.data.playerId!, answer });
+      }
+    });
+
+    socket.on('webrtc:ice-candidate', ({ targetId, candidate }) => {
+      const room = RM.getRoom(socket.data.roomCode!);
+      if (!room) return;
+      const target = room.players.find(p => p.id === targetId);
+      if (target?.isConnected) {
+        io.to(target.socketId).emit('webrtc:ice-candidate', { senderId: socket.data.playerId!, candidate });
+      }
+    });
+
   });
 }

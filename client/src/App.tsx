@@ -4,6 +4,7 @@ import { RoomSnapshot, Player, ChatMessage } from './shared/types';
 import { HomePage } from './components/HomePage';
 import { RoomLobby } from './components/RoomLobby';
 import { WinnerModal } from './components/WinnerModal';
+import { VideoPanel } from './components/VideoPanel';
 import { FindMatchGame } from './components/games/FindMatchGame';
 import { TicTacToeGame } from './components/games/TicTacToeGame';
 import { ReactionDuelGame } from './components/games/ReactionDuelGame';
@@ -14,9 +15,16 @@ import { MemoryDuelGame } from './components/games/MemoryDuelGame';
 import { NumberBattleGame } from './components/games/NumberBattleGame';
 import { ColorClashGame } from './components/games/ColorClashGame';
 import { DotsAndBoxesGame } from './components/games/DotsAndBoxesGame';
+import { TapRoyaleGame } from './components/games/TapRoyaleGame';
+import { TargetRushGame } from './components/games/TargetRushGame';
+import { WordScrambleGame } from './components/games/WordScrambleGame';
+import { TriviaBlitzGame } from './components/games/TriviaBlitzGame';
+import { SpeedMathGame } from './components/games/SpeedMathGame';
+import { PatternMasterGame } from './components/games/PatternMasterGame';
 import { ALL_GAMES } from './shared/constants.ts';
-import { Volume2, VolumeX, Swords } from 'lucide-react';
+import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import { sounds } from './lib/sound';
+import { useMediaChat } from './hooks/useMediaChat';
 
 export function App() {
   const [room, setRoom] = useState<RoomSnapshot | null>(null);
@@ -24,6 +32,19 @@ export function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { micEnabled, cameraEnabled, toggleMic, toggleCamera, activeSpeakers, remoteStreams, localStream, mediaError } = useMediaChat(
+    socket,
+    room,
+    currentPlayer?.id
+  );
+
+  useEffect(() => {
+    if (mediaError) {
+      setErrorMessage(mediaError);
+      setTimeout(() => setErrorMessage(null), 4000);
+    }
+  }, [mediaError]);
 
   useEffect(() => {
     socket.on('room:update', (updatedRoom) => {
@@ -99,31 +120,75 @@ export function App() {
   const selectedGameMeta = ALL_GAMES.find((g) => g.id === room?.selectedGame);
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col items-center p-4 sm:p-6 font-sans relative">
+    <div className="min-h-screen text-slate-100 flex flex-col items-center p-4 sm:p-6 font-sans relative overflow-x-hidden arcade-bg">
+      <div className="pointer-events-none absolute inset-0 opacity-70 scanlines" />
       {/* Top Navbar */}
-      <header className="w-full max-w-6xl flex items-center justify-between py-4 border-b border-slate-800/80 mb-6">
+      <header className="relative z-10 w-full max-w-7xl flex items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-950/55 px-5 py-4 mb-6 shadow-2xl backdrop-blur-xl">
         <div
           onClick={() => {
             if (!room) window.location.href = '/';
           }}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg font-black text-white">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-300 via-fuchsia-500 to-amber-300 flex items-center justify-center shadow-lg font-black text-slate-950">
             <Swords className="w-6 h-6" />
           </div>
           <span className="text-2xl font-black tracking-tight text-white">
-            DUEL<span className="text-purple-400">ZONE</span>
+            DUEL<span className="text-cyan-300">ZONE</span>
           </span>
         </div>
 
-        <button
-          onClick={toggleSound}
-          className="p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition active:scale-95 text-slate-300 cursor-pointer"
-          title="Toggle Sound"
-        >
-          {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
-        </button>
+        <div className="flex items-center gap-3">
+          {room && (
+            <>
+              <button
+                onClick={toggleMic}
+                className={`p-2.5 rounded-xl border transition active:scale-95 flex items-center gap-2 font-bold text-xs ${
+                  micEnabled 
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                    : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-400'
+                }`}
+                title="Toggle Voice Chat"
+              >
+                {micEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+                <span className="hidden sm:inline">{micEnabled ? 'MIC ON' : 'MIC OFF'}</span>
+              </button>
+
+              <button
+                onClick={toggleCamera}
+                className={`p-2.5 rounded-xl border transition active:scale-95 flex items-center gap-2 font-bold text-xs ${
+                  cameraEnabled 
+                    ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.2)]' 
+                    : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-400'
+                }`}
+                title="Toggle Video Chat"
+              >
+                {cameraEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+                <span className="hidden sm:inline">{cameraEnabled ? 'CAM ON' : 'CAM OFF'}</span>
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={toggleSound}
+            className="p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition active:scale-95 text-slate-300 cursor-pointer focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-300"
+            title="Toggle Game Sounds"
+          >
+            {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
+          </button>
+        </div>
       </header>
+
+      {/* Floating Video Panel — always visible when any camera is on */}
+      {room && (
+        <VideoPanel
+          players={room.players}
+          currentPlayerId={currentPlayer?.id}
+          localStream={localStream}
+          remoteStreams={remoteStreams}
+          activeSpeakers={activeSpeakers}
+        />
+      )}
 
       {/* Error Toast */}
       {errorMessage && (
@@ -136,7 +201,7 @@ export function App() {
       {!room ? (
         <HomePage onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} />
       ) : room.status === 'playing' && room.selectedGame && room.gameState ? (
-        <main className="w-full flex flex-col items-center justify-center">
+        <main className="relative z-10 w-full flex flex-col items-center justify-center">
           {room.selectedGame === 'find-match' && (
             <FindMatchGame
               socket={socket}
@@ -217,6 +282,54 @@ export function App() {
               opponentPlayer={opponent}
             />
           )}
+          {room.selectedGame === 'tap-royale' && (
+            <TapRoyaleGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'target-rush' && (
+            <TargetRushGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'word-scramble' && (
+            <WordScrambleGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'trivia-blitz' && (
+            <TriviaBlitzGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'speed-math' && (
+            <SpeedMathGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'pattern-master' && (
+            <PatternMasterGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
 
           {/* Winner Modal */}
           {winnerId && (
@@ -235,6 +348,9 @@ export function App() {
           room={room}
           currentPlayer={currentPlayer}
           messages={messages}
+          activeSpeakers={activeSpeakers}
+          remoteStreams={remoteStreams}
+          localStream={localStream}
         />
       )}
     </div>
