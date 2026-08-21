@@ -22,6 +22,15 @@ import { TriviaBlitzGame } from './components/games/TriviaBlitzGame';
 import { SpeedMathGame } from './components/games/SpeedMathGame';
 import { PatternMasterGame } from './components/games/PatternMasterGame';
 import { PicComboGame } from './components/games/PicComboGame';
+import { ArcheryGame } from './components/games/ArcheryGame';
+import { BowlingGame } from './components/games/BowlingGame';
+import { HammerGame } from './components/games/HammerGame';
+import { AnimalBalanceGame } from './components/games/AnimalBalanceGame';
+import { PingBallGame } from './components/games/PingBallGame';
+import { FruitNinjaGame } from './components/games/FruitNinjaGame';
+import { CornholeGame } from './components/games/CornholeGame';
+import { KnifeThrowerGame } from './components/games/KnifeThrowerGame';
+import { ChainReactionGame } from './components/games/ChainReactionGame';
 import { ALL_GAMES } from './shared/constants.ts';
 import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff, LogOut } from 'lucide-react';
 import { sounds } from './lib/sound';
@@ -353,6 +362,15 @@ export function App() {
               room={room}
             />
           )}
+          {room.selectedGame === 'archery' && <ArcheryGame />}
+          {room.selectedGame === 'bowling' && <BowlingGame />}
+          {room.selectedGame === 'hammer' && <HammerGame />}
+          {room.selectedGame === 'animal-balance' && <AnimalBalanceGame />}
+          {room.selectedGame === 'ping-ball' && <PingBallGame />}
+          {room.selectedGame === 'fruit-ninja' && <FruitNinjaGame />}
+          {room.selectedGame === 'cornhole' && <CornholeGame />}
+          {room.selectedGame === 'knife-thrower' && <KnifeThrowerGame />}
+          {room.selectedGame === 'chain-reaction' && <ChainReactionGame />}
 
           {/* Winner Modal */}
           {winnerId && (

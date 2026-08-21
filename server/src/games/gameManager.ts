@@ -17,6 +17,15 @@ import { createTBState, applyTBAnswer, nextTBRound } from '../games/triviaBlitz'
 import { createSpeedMathState, applySpeedMathAnswer, nextSpeedMathRound } from '../games/speedMath';
 import { createPatternMasterState, applyPatternInput, nextPatternRound } from '../games/patternMaster';
 import { createPicComboState, applyPicComboGuess, nextPicComboRound } from '../games/picCombo';
+import { createArcheryState, handleArcheryAction } from '../games/archery';
+import { createBowlingState, handleBowlingAction } from '../games/bowling';
+import { createHammerState, handleHammerAction } from '../games/hammer';
+import { createAnimalBalanceState, handleAnimalBalanceAction } from '../games/animalBalance';
+import { createPingBallState, handlePingBallAction } from '../games/pingBall';
+import { createFruitNinjaState, handleFruitNinjaAction } from '../games/fruitNinja';
+import { createCornholeState, handleCornholeAction } from '../games/cornhole';
+import { createKnifeThrowerState, handleKnifeThrowerAction } from '../games/knifeThrower';
+import { createChainReactionState, handleChainReactionAction } from '../games/chainReaction';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -96,6 +105,24 @@ export function createGameState(
       return { state: createPatternMasterState(players) };
     case 'pic-combo':
       return { state: createPicComboState(players) };
+    case 'archery':
+      return { state: createArcheryState(players) };
+    case 'bowling':
+      return { state: createBowlingState(players) };
+    case 'hammer':
+      return { state: createHammerState(players) };
+    case 'animal-balance':
+      return { state: createAnimalBalanceState(players) };
+    case 'ping-ball':
+      return { state: createPingBallState(players) };
+    case 'fruit-ninja':
+      return { state: createFruitNinjaState(players) };
+    case 'cornhole':
+      return { state: createCornholeState(players) };
+    case 'knife-thrower':
+      return { state: createKnifeThrowerState(players) };
+    case 'chain-reaction':
+      return { state: createChainReactionState(players) };
     default:
       return { state: null };
   }
@@ -145,6 +172,24 @@ export function handleGameAction(
       return handlePatternMasterAction(currentState, playerId, action, roomCode, broadcastFn);
     case 'pic-combo':
       return handlePicComboAction(currentState, playerId, action, broadcastFn);
+    case 'archery':
+      return handleArcheryAction(currentState, playerId, action);
+    case 'bowling':
+      return handleBowlingAction(currentState, playerId, action);
+    case 'hammer':
+      return handleHammerAction(currentState, playerId, action);
+    case 'animal-balance':
+      return handleAnimalBalanceAction(currentState, playerId, action);
+    case 'ping-ball':
+      return handlePingBallAction(currentState, playerId, action);
+    case 'fruit-ninja':
+      return handleFruitNinjaAction(currentState, playerId, action);
+    case 'cornhole':
+      return handleCornholeAction(currentState, playerId, action);
+    case 'knife-thrower':
+      return handleKnifeThrowerAction(currentState, playerId, action);
+    case 'chain-reaction':
+      return handleChainReactionAction(currentState, playerId, action);
     default:
       return null;
   }

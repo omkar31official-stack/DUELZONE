@@ -19,7 +19,16 @@ export type GameId =
   | 'trivia-blitz'
   | 'speed-math'
   | 'pattern-master'
-  | 'pic-combo';
+  | 'pic-combo'
+  | 'archery'
+  | 'bowling'
+  | 'hammer'
+  | 'animal-balance'
+  | 'ping-ball'
+  | 'knife-thrower'
+  | 'fruit-ninja'
+  | 'cornhole'
+  | 'chain-reaction';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
