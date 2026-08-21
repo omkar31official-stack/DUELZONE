@@ -33,6 +33,7 @@ import { KnifeThrowerGame } from './components/games/KnifeThrowerGame';
 import { ChainReactionGame } from './components/games/ChainReactionGame';
 import { CoopPuzzleGame } from './components/games/CoopPuzzleGame';
 import { WaterSortGame } from './components/games/WaterSortGame';
+import { SudokuGame } from './components/games/SudokuGame';
 import { ALL_GAMES } from './shared/constants.ts';
 import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff, LogOut } from 'lucide-react';
 import { sounds } from './lib/sound';
@@ -389,6 +390,7 @@ export function App() {
           {room.selectedGame === 'chain-reaction' && <ChainReactionGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'coop-puzzle' && <CoopPuzzleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'water-sort' && <WaterSortGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
+          {room.selectedGame === 'sudoku' && <SudokuGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
 
           {/* Winner Modal */}
           {winnerId && (

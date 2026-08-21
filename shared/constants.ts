@@ -324,6 +324,17 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     icon: '🧪',
   },
   {
+    id: 'sudoku',
+    name: 'Sudoku Co-op',
+    description: 'Solve the Sudoku board together! Difficulty increases each round.',
+    category: 'MIND',
+    minPlayers: 1,
+    maxPlayers: 5,
+    estimatedMinutes: '5-15 min',
+    difficulty: 'Hard',
+    icon: '🔢',
+  },
+  {
     id: 'chain-reaction',
     name: 'Chain Reaction',
     description: 'Place orbs to explode into neighbor cells. Wipe out the opponent!',

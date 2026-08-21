@@ -30,7 +30,8 @@ export type GameId =
   | 'cornhole'
   | 'chain-reaction'
   | 'coop-puzzle'
-  | 'water-sort';
+  | 'water-sort'
+  | 'sudoku';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -420,4 +421,17 @@ export interface WaterSortState {
   completedAt: number | null;
   selectedTubeIndex: number | null;
   selectedByPlayer: string | null;
+}
+
+export interface SudokuState {
+  phase: 'countdown' | 'playing' | 'result';
+  level: number; // Increases when a board is solved
+  board: number[][]; // 9x9 current board (0 for empty)
+  solution: number[][]; // 9x9 solution
+  initialBoard: boolean[][]; // 9x9 boolean, true if the cell was provided at the start (cannot be edited)
+  hintsRemaining: number;
+  moves: number;
+  mistakes: number;
+  startedAt: number | null;
+  completedAt: number | null;
 }

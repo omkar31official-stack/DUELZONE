@@ -28,6 +28,7 @@ import { createKnifeThrowerState, handleKnifeThrowerAction } from '../games/knif
 import { createChainReactionState, handleChainReactionAction } from '../games/chainReaction';
 import { createCoopPuzzleState, handleCoopPuzzleAction } from '../games/coopPuzzle';
 import { createWaterSortState, handleWaterSortAction } from '../games/waterSort';
+import { createSudokuState, handleSudokuAction } from '../games/sudoku';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -129,6 +130,8 @@ export function createGameState(
       return { state: createCoopPuzzleState(players) };
     case 'water-sort':
       return { state: createWaterSortState(players) };
+    case 'sudoku':
+      return { state: createSudokuState(players) };
     default:
       return { state: null };
   }
@@ -200,6 +203,8 @@ export function handleGameAction(
       return handleCoopPuzzleAction(currentState as any, playerId, action);
     case 'water-sort':
       return handleWaterSortAction(currentState as any, playerId, action);
+    case 'sudoku':
+      return handleSudokuAction(currentState as any, playerId, action);
     default:
       return null;
   }
