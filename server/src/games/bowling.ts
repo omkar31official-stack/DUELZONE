@@ -45,6 +45,48 @@ export function createBowlingState(players: string[]): BowlingState {
   };
 }
 
+function calculateStandardBowlingScore(frames: BowlingFrame[]): number {
+  let score = 0;
+  const allRolls: number[] = [];
+  
+  for (let i = 0; i < 10; i++) {
+    if (frames[i] && frames[i].rolls) {
+      allRolls.push(...frames[i].rolls);
+    }
+  }
+
+  let flatIndex = 0;
+  for (let frameIndex = 0; frameIndex < 10; frameIndex++) {
+    if (flatIndex >= allRolls.length) break;
+
+    const frame = frames[frameIndex];
+    if (!frame || frame.rolls.length === 0) break;
+
+    const roll1 = allRolls[flatIndex] || 0;
+    
+    if (roll1 === 10) { // Strike
+      score += 10;
+      if (flatIndex + 1 < allRolls.length) score += allRolls[flatIndex + 1];
+      if (flatIndex + 2 < allRolls.length) score += allRolls[flatIndex + 2];
+      flatIndex += 1;
+    } else {
+      const roll2 = allRolls[flatIndex + 1];
+      if (roll2 !== undefined) {
+        if (roll1 + roll2 === 10) { // Spare
+          score += 10;
+          if (flatIndex + 2 < allRolls.length) score += allRolls[flatIndex + 2];
+        } else { // Open frame
+          score += roll1 + roll2;
+        }
+      } else {
+        score += roll1; // incomplete frame
+      }
+      flatIndex += 2;
+    }
+  }
+  return score;
+}
+
 export function handleBowlingAction(state: BowlingState, player: string, action: any): BowlingState {
   const allPlayers = Object.keys(state.scores);
   if (action.type === 'START') {
@@ -73,14 +115,10 @@ export function handleBowlingAction(state: BowlingState, player: string, action:
       const hitStrength = accuracy * power;
       const numPinsToFall = Math.floor(hitStrength * 10) + (Math.random() > 0.5 ? 1 : 0); // slight randomness for realism
       
-      // Select which specific pins fall from the active ones
       const availablePins = [...state.activePins];
-      
-      // If it's a strike/good hit, the front pins fall first
       if (numPinsToFall >= availablePins.length) {
         fallenPins = [...availablePins];
       } else {
-        // Shuffle and pick
         for (let i = 0; i < numPinsToFall; i++) {
           if (availablePins.length === 0) break;
           const idx = Math.floor(Math.random() * availablePins.length);
@@ -98,30 +136,38 @@ export function handleBowlingAction(state: BowlingState, player: string, action:
     const playerFrames = newFrames[player];
     playerFrames[state.currentFrame].rolls.push(fallenPins.length);
     
-    // Simple score calculation (not full standard bowling rules with lookahead for brevity, but accumulates)
-    let newScores = { ...state.scores };
-    newScores[player] += fallenPins.length;
-    if (isStrike) newScores[player] += 5; // Bonus for strike
-    if (state.currentRollIndex === 1 && state.activePins.length === 10 && newActivePins.length === 0) newScores[player] += 3; // Bonus for spare
+    // Calculate full standard score
+    const newScores = { ...state.scores };
+    newScores[player] = calculateStandardBowlingScore(playerFrames);
 
     let nextRollIndex = state.currentRollIndex + 1;
     let nextTurnIndex = state.currentTurnIndex;
     let nextFrame = state.currentFrame;
     let nextActivePins = newActivePins;
+    let frameOver = false;
 
-    if (isStrike || nextRollIndex >= 2) {
-      // Next player's turn
-      nextRollIndex = 0;
-      nextTurnIndex = (state.currentTurnIndex + 1) % allPlayers.length;
-      nextActivePins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // Reset pins for next player
-      
-      // If we looped back to player 1, advance frame
-      if (nextTurnIndex === 0) {
-        nextFrame++;
+    if (state.currentFrame < 9) {
+      if (isStrike || nextRollIndex >= 2) frameOver = true;
+    } else {
+      // 10th frame rules
+      const rollsThisFrame = playerFrames[state.currentFrame].rolls;
+      if (rollsThisFrame.length === 2 && rollsThisFrame[0] + rollsThisFrame[1] < 10) {
+        frameOver = true;
+      } else if (rollsThisFrame.length >= 3) {
+        frameOver = true;
+      } else if (rollsThisFrame.length < 3 && nextActivePins.length === 0) {
+         // Reset pins for the bonus roll!
+         nextActivePins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
       }
     }
 
-    // Game Over?
+    if (frameOver) {
+      nextRollIndex = 0;
+      nextTurnIndex = (state.currentTurnIndex + 1) % allPlayers.length;
+      nextActivePins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      if (nextTurnIndex === 0) nextFrame++;
+    }
+
     let newPhase: 'countdown' | 'playing' | 'result' = state.phase;
     let winner = null;
     if (nextFrame >= 10) {
