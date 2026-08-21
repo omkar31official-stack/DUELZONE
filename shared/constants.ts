@@ -302,6 +302,17 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     icon: '🎯',
   },
   {
+    id: 'coop-puzzle',
+    name: 'Coop Puzzle',
+    description: 'Work together to arrange the puzzle pieces and reveal the image!',
+    category: 'MIND',
+    minPlayers: 1,
+    maxPlayers: 5,
+    estimatedMinutes: '3-6 min',
+    difficulty: 'Medium',
+    icon: '🧩',
+  },
+  {
     id: 'chain-reaction',
     name: 'Chain Reaction',
     description: 'Place orbs to explode into neighbor cells. Wipe out the opponent!',

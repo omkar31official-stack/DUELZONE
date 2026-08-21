@@ -26,6 +26,7 @@ import { createFruitNinjaState, handleFruitNinjaAction } from '../games/fruitNin
 import { createCornholeState, handleCornholeAction } from '../games/cornhole';
 import { createKnifeThrowerState, handleKnifeThrowerAction } from '../games/knifeThrower';
 import { createChainReactionState, handleChainReactionAction } from '../games/chainReaction';
+import { createCoopPuzzleState, handleCoopPuzzleAction } from '../games/coopPuzzle';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -123,6 +124,8 @@ export function createGameState(
       return { state: createKnifeThrowerState(players) };
     case 'chain-reaction':
       return { state: createChainReactionState(players) };
+    case 'coop-puzzle':
+      return { state: createCoopPuzzleState(players) };
     default:
       return { state: null };
   }
@@ -190,6 +193,8 @@ export function handleGameAction(
       return handleKnifeThrowerAction(currentState as any, playerId, action);
     case 'chain-reaction':
       return handleChainReactionAction(currentState as any, playerId, action);
+    case 'coop-puzzle':
+      return handleCoopPuzzleAction(currentState as any, playerId, action);
     default:
       return null;
   }

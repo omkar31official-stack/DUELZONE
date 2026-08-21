@@ -28,7 +28,8 @@ export type GameId =
   | 'knife-thrower'
   | 'fruit-ninja'
   | 'cornhole'
-  | 'chain-reaction';
+  | 'chain-reaction'
+  | 'coop-puzzle';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -394,4 +395,16 @@ export interface PicComboState {
   gameWinner: string | null;
   phase: 'playing' | 'result';
   startedAt: number | null;
+}
+
+export interface CoopPuzzleState {
+  phase: 'countdown' | 'playing' | 'result';
+  gridSize: number; // e.g. 3 for 3x3
+  pieces: number[]; // array of piece ids [0, 1, 2, ..., 8] representing their current positions
+  imageUrl: string;
+  moves: number;
+  startedAt: number | null;
+  completedAt: number | null;
+  selectedPieceIndex: number | null; // For selecting and swapping pieces
+  selectedByPlayer: string | null;
 }
