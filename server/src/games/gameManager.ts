@@ -173,23 +173,23 @@ export function handleGameAction(
     case 'pic-combo':
       return handlePicComboAction(currentState, playerId, action, broadcastFn);
     case 'archery':
-      return handleArcheryAction(currentState, playerId, action);
+      return handleArcheryAction(currentState as any, playerId, action);
     case 'bowling':
-      return handleBowlingAction(currentState, playerId, action);
+      return handleBowlingAction(currentState as any, playerId, action);
     case 'hammer':
       return handleHammerAction(currentState as any, playerId, action);
     case 'animal-balance':
-      return handleAnimalBalanceAction(currentState, playerId, action);
+      return handleAnimalBalanceAction(currentState as any, playerId, action);
     case 'ping-ball':
-      return handlePingBallAction(currentState, playerId, action);
+      return handlePingBallAction(currentState as any, playerId, action);
     case 'fruit-ninja':
-      return handleFruitNinjaAction(currentState, playerId, action);
+      return handleFruitNinjaAction(currentState as any, playerId, action);
     case 'cornhole':
-      return handleCornholeAction(currentState, playerId, action);
+      return handleCornholeAction(currentState as any, playerId, action);
     case 'knife-thrower':
       return handleKnifeThrowerAction(currentState as any, playerId, action);
     case 'chain-reaction':
-      return handleChainReactionAction(currentState, playerId, action);
+      return handleChainReactionAction(currentState as any, playerId, action);
     default:
       return null;
   }

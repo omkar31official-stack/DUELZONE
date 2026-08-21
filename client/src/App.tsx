@@ -362,8 +362,8 @@ export function App() {
               room={room}
             />
           )}
-          {room.selectedGame === 'archery' && <ArcheryGame />}
-          {room.selectedGame === 'bowling' && <BowlingGame />}
+          {room.selectedGame === 'archery' && <ArcheryGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
+          {room.selectedGame === 'bowling' && <BowlingGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'hammer' && (
             <HammerGame
               socket={socket}
@@ -372,10 +372,10 @@ export function App() {
               room={room}
             />
           )}
-          {room.selectedGame === 'animal-balance' && <AnimalBalanceGame />}
-          {room.selectedGame === 'ping-ball' && <PingBallGame />}
-          {room.selectedGame === 'fruit-ninja' && <FruitNinjaGame />}
-          {room.selectedGame === 'cornhole' && <CornholeGame />}
+          {room.selectedGame === 'animal-balance' && <AnimalBalanceGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
+          {room.selectedGame === 'ping-ball' && <PingBallGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
+          {room.selectedGame === 'fruit-ninja' && <FruitNinjaGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
+          {room.selectedGame === 'cornhole' && <CornholeGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'knife-thrower' && (
             <KnifeThrowerGame
               socket={socket}
@@ -384,7 +384,7 @@ export function App() {
               room={room}
             />
           )}
-          {room.selectedGame === 'chain-reaction' && <ChainReactionGame />}
+          {room.selectedGame === 'chain-reaction' && <ChainReactionGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
 
           {/* Winner Modal */}
           {winnerId && (
