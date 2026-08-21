@@ -46,7 +46,7 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,.28),transparent_32%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,.22),transparent_30%),linear-gradient(135deg,rgba(251,191,36,.08),transparent_40%)]" />
         <div className="relative mx-auto max-w-4xl space-y-5">
           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-xs font-black uppercase tracking-[0.3em] text-cyan-200">
-            <Sparkles className="w-4 h-4" /> 16 real-time games · 2-5 players
+            <Sparkles className="w-4 h-4" /> 17 real-time games · 1-5 players
           </div>
 
           <h1 className="text-6xl font-black tracking-tighter text-white sm:text-8xl lg:text-9xl">
@@ -60,7 +60,7 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
           <div className="grid gap-3 pt-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
               <Gamepad2 className="mx-auto mb-2 h-6 w-6 text-cyan-300" />
-              <p className="text-2xl font-black text-white">16</p>
+              <p className="text-2xl font-black text-white">17</p>
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Mini games</p>
             </div>
             <div className="rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">

@@ -21,8 +21,9 @@ import { WordScrambleGame } from './components/games/WordScrambleGame';
 import { TriviaBlitzGame } from './components/games/TriviaBlitzGame';
 import { SpeedMathGame } from './components/games/SpeedMathGame';
 import { PatternMasterGame } from './components/games/PatternMasterGame';
+import { PicComboGame } from './components/games/PicComboGame';
 import { ALL_GAMES } from './shared/constants.ts';
-import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff, LogOut } from 'lucide-react';
 import { sounds } from './lib/sound';
 import { useMediaChat } from './hooks/useMediaChat';
 
@@ -166,6 +167,20 @@ export function App() {
                 {cameraEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
                 <span className="hidden sm:inline">{cameraEnabled ? 'CAM ON' : 'CAM OFF'}</span>
               </button>
+
+              {room.status === 'playing' && (
+                <button
+                  onClick={() => {
+                    sounds.playClick();
+                    socket.emit('room:returnToLobby');
+                  }}
+                  className="p-2.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-700/60 text-rose-200 rounded-xl transition active:scale-95 flex items-center gap-2 font-black text-xs shadow-lg cursor-pointer"
+                  title="Exit current game and return to lobby"
+                >
+                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <span>EXIT GAME</span>
+                </button>
+              )}
             </>
           )}
 
@@ -324,6 +339,14 @@ export function App() {
           )}
           {room.selectedGame === 'pattern-master' && (
             <PatternMasterGame
+              socket={socket}
+              state={room.gameState as any}
+              currentPlayer={currentPlayer}
+              room={room}
+            />
+          )}
+          {room.selectedGame === 'pic-combo' && (
+            <PicComboGame
               socket={socket}
               state={room.gameState as any}
               currentPlayer={currentPlayer}

@@ -116,15 +116,18 @@ export function registerSocketHandlers(io: AppServer) {
       io.to(roomCode).emit('room:update', snap);
       io.to(roomCode).emit('game:state', state);
 
-      // For find-match: auto-start countdown
+      const broadcast = (newState: unknown, event?: { type: string; payload?: unknown }) => {
+        RM.setGameState(roomCode, newState);
+        io.to(roomCode).emit('game:state', newState);
+        if (event) io.to(roomCode).emit('game:event', event);
+      };
+
       if (room.selectedGame === 'find-match') {
-        // Trigger ROUND_START via gameManager
-        const broadcast = (newState: unknown, event?: { type: string; payload?: unknown }) => {
-          RM.setGameState(roomCode, newState);
-          io.to(roomCode).emit('game:state', newState);
-          if (event) io.to(roomCode).emit('game:event', event);
-        };
         handleGameAction(room.selectedGame, state, playerId, { type: 'ROUND_START' }, roomCode, broadcast);
+      } else if (room.selectedGame === 'reaction-duel') {
+        handleGameAction(room.selectedGame, state, playerId, { type: 'START_ROUND' }, roomCode, broadcast);
+      } else if (room.selectedGame === 'quick-tap' || room.selectedGame === 'tap-royale') {
+        handleGameAction(room.selectedGame, state, playerId, { type: 'START' }, roomCode, broadcast);
       }
 
       console.log(`[game] started: ${room.selectedGame} in ${roomCode}`);

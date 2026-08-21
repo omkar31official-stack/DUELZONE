@@ -18,7 +18,8 @@ export type GameId =
   | 'word-scramble'
   | 'trivia-blitz'
   | 'speed-math'
-  | 'pattern-master';
+  | 'pattern-master'
+  | 'pic-combo';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -350,6 +351,7 @@ export interface SpeedMathState {
 }
 
 // ─── Pattern Master ──────────────────────────
+// ─── Pattern Master ──────────────────────────
 export interface PatternMasterState {
   round: number;
   totalRounds: number;
@@ -360,5 +362,27 @@ export interface PatternMasterState {
   scores: Record<string, number>;
   gameWinner: string | null;
   phase: 'showing' | 'input' | 'result';
+  startedAt: number | null;
+}
+
+// ─── Pic Combo (2 Pics 1 Word) ───────────────
+export interface PicComboQuestion {
+  id: string;
+  img1: string; // Emoji symbol 1
+  img2: string; // Emoji symbol 2
+  hint: string;
+  answer: string;
+}
+
+export interface PicComboState {
+  round: number;
+  totalRounds: number;
+  currentQuestion: PicComboQuestion;
+  remainingQuestions: PicComboQuestion[];
+  guesses: Record<string, string | null>;
+  roundWinner: string | null;
+  scores: Record<string, number>;
+  gameWinner: string | null;
+  phase: 'playing' | 'result';
   startedAt: number | null;
 }

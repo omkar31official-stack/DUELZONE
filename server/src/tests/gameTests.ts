@@ -159,25 +159,31 @@ console.log('\n1️⃣6️⃣ Testing 5-Player Pattern Master...');
 let pm = createGameState('pattern-master', players5).state as any;
 assert(pm.sequence.length === 3, 'Pattern master sequence initialized with 3 steps');
 
-// 17. GAMEMANAGER GENERATION & DISPATCH TEST FOR ALL 16 GAMES
-console.log('\n1️⃣7️⃣ Verifying GameManager Instantiation for ALL 16 Games...');
+// 17. PIC COMBO (5-PLAYER)
+console.log('\n1️⃣7️⃣ Testing 5-Player Pic Combo (2 Pics 1 Word)...');
+let pc = createGameState('pic-combo', players5).state as any;
+assert(pc.currentQuestion.img1 && pc.currentQuestion.img2, 'Pic combo has 2 picture symbols');
+
+// 18. GAMEMANAGER GENERATION & DISPATCH TEST FOR ALL 17 GAMES
+console.log('\n1️⃣8️⃣ Verifying GameManager Instantiation for ALL 17 Games...');
 const gameIds = [
   'find-match', 'tic-tac-toe', 'connect-four', 'rock-paper-scissors',
   'reaction-duel', 'quick-tap', 'memory-duel', 'number-battle',
   'color-clash', 'dots-and-boxes', 'tap-royale', 'target-rush',
-  'word-scramble', 'trivia-blitz', 'speed-math', 'pattern-master'
+  'word-scramble', 'trivia-blitz', 'speed-math', 'pattern-master',
+  'pic-combo'
 ] as const;
 
 let allCreated = true;
 gameIds.forEach((id) => {
-  const players = id === 'tap-royale' || id === 'target-rush' || id === 'word-scramble' || id === 'trivia-blitz' || id === 'speed-math' || id === 'pattern-master' ? players5 : players2;
+  const players = id === 'tap-royale' || id === 'target-rush' || id === 'word-scramble' || id === 'trivia-blitz' || id === 'speed-math' || id === 'pattern-master' || id === 'pic-combo' ? players5 : players2;
   const { state } = createGameState(id, players);
   if (!state) {
     console.error(`  ❌ Failed to create game state for ${id}`);
     allCreated = false;
   }
 });
-assert(allCreated, 'All 16 games successfully initialized via GameManager');
+assert(allCreated, 'All 17 games successfully initialized via GameManager');
 
 // Summary
 console.log('\n========================================');

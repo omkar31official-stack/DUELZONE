@@ -16,13 +16,14 @@ import { createWSState, applyWSGuess, nextWSRound } from '../games/wordScramble'
 import { createTBState, applyTBAnswer, nextTBRound } from '../games/triviaBlitz';
 import { createSpeedMathState, applySpeedMathAnswer, nextSpeedMathRound } from '../games/speedMath';
 import { createPatternMasterState, applyPatternInput, nextPatternRound } from '../games/patternMaster';
+import { createPicComboState, applyPicComboGuess, nextPicComboRound } from '../games/picCombo';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
 type Players = string[];
 
 function asDuelPlayers(players: Players): [string, string] {
-  return [players[0], players[1]];
+  return [players[0], players[1] || 'Bot'];
 }
 
 // Timer registry for automated round transitions
@@ -52,7 +53,8 @@ export function createGameState(
 ): { state: GameState; difficulty?: string } {
   switch (gameId) {
     case 'find-match': {
-      const scores: Record<string, number> = { [players[0]]: 0, [players[1]]: 0 };
+      const p2 = players[1] || 'Bot';
+      const scores: Record<string, number> = { [players[0]]: 0, [p2]: 0 };
       const round = generateFindMatchRound(1, FIND_MATCH_DEFAULT_ROUNDS, scores, 'normal');
       const state: FindMatchRoundState = {
         ...round,
@@ -92,6 +94,8 @@ export function createGameState(
       return { state: createSpeedMathState(players) };
     case 'pattern-master':
       return { state: createPatternMasterState(players) };
+    case 'pic-combo':
+      return { state: createPicComboState(players) };
     default:
       return { state: null };
   }
@@ -139,6 +143,8 @@ export function handleGameAction(
       return handleSpeedMathAction(currentState, playerId, action, broadcastFn);
     case 'pattern-master':
       return handlePatternMasterAction(currentState, playerId, action, roomCode, broadcastFn);
+    case 'pic-combo':
+      return handlePicComboAction(currentState, playerId, action, broadcastFn);
     default:
       return null;
   }
@@ -539,6 +545,26 @@ function handlePatternMasterAction(
     if (!result) return null;
     if (result.phase === 'result' && !result.gameWinner) {
       setTimeout(() => broadcast(nextPatternRound(result)), 2500);
+    }
+    return result;
+  }
+  return null;
+}
+
+// ─── Pic Combo ───────────────────────────────────────────────────────────────
+function handlePicComboAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  broadcast: (state: GameState) => void,
+): GameState | null {
+  if (action.type === 'GUESS') {
+    const guess = (action.payload as { guess: string })?.guess;
+    if (!guess || typeof guess !== 'string') return null;
+    const result = applyPicComboGuess(state as any, playerId, guess);
+    if (!result) return null;
+    if (result.phase === 'result' && !result.gameWinner) {
+      setTimeout(() => broadcast(nextPicComboRound(result)), 2500);
     }
     return result;
   }
