@@ -49,8 +49,8 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
             <Sparkles className="w-4 h-4" /> 17 real-time games · 1-5 players
           </div>
 
-          <h1 className="text-6xl font-black tracking-tighter text-white sm:text-8xl lg:text-9xl">
-            DUEL<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-400 to-amber-300">ZONE</span>
+          <h1 className="text-6xl font-display tracking-wider text-white sm:text-8xl lg:text-9xl drop-shadow-[0_0_15px_rgba(124,58,237,0.8)]">
+            DUEL<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-secondary via-brand-primary to-brand-accent">ZONE</span>
           </h1>
 
           <p className="mx-auto max-w-2xl text-base font-semibold leading-7 text-slate-300 sm:text-xl">
@@ -78,19 +78,22 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
       </div>
 
       {/* Main Action Forms */}
-      <div className="w-full max-w-md rounded-[2rem] border border-slate-700/80 bg-slate-900/90 p-8 shadow-2xl shadow-fuchsia-950/20 backdrop-blur">
+      <div className="w-full max-w-md rounded-none border-2 border-brand-primary/50 bg-brand-card/90 p-8 shadow-[0_0_30px_rgba(124,58,237,0.3)] backdrop-blur relative overflow-hidden">
+        {/* Cyberpunk accent lines */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-secondary via-brand-primary to-brand-accent" />
+        <div className="absolute bottom-0 right-0 w-24 h-1 bg-brand-accent" />
         {mode === 'home' && (
           <div className="flex flex-col gap-4">
             <button
               onClick={() => { sounds.playClick(); setMode('create'); }}
-              className="w-full py-4 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300 hover:brightness-110 font-black text-lg text-slate-950 rounded-2xl shadow-xl transition active:scale-95 flex items-center justify-center gap-3 cursor-pointer focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-300"
+              className="w-full py-4 bg-brand-primary hover:bg-brand-primary/80 font-display tracking-widest text-lg text-white rounded-none border border-brand-secondary shadow-[0_0_15px_rgba(124,58,237,0.5)] transition active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
             >
               <Swords className="w-5 h-5" /> CREATE PRIVATE ROOM
             </button>
 
             <button
               onClick={() => { sounds.playClick(); setMode('join'); }}
-              className="w-full py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 font-black text-lg text-slate-200 rounded-2xl transition active:scale-95 flex items-center justify-center gap-3 cursor-pointer focus-visible:outline focus-visible:outline-4 focus-visible:outline-fuchsia-300"
+              className="w-full py-4 bg-transparent hover:bg-brand-card border-2 border-brand-accent font-display tracking-widest text-lg text-brand-accent rounded-none transition active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
             >
               <Users className="w-5 h-5" /> JOIN ROOM WITH CODE
             </button>
@@ -110,7 +113,7 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
                 onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                 placeholder="e.g. Omkar, Shadow, Tiger"
                 maxLength={16}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-semibold focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/15"
+                className="w-full bg-brand-background border-b-2 border-brand-primary rounded-none px-4 py-3 text-white font-display focus:outline-none focus:border-brand-accent focus:shadow-[0_0_10px_rgba(244,63,94,0.5)] transition"
               />
             </div>
 
@@ -120,13 +123,13 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
               <button
                 type="button"
                 onClick={() => setMode('home')}
-                className="px-4 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-700"
+                className="px-4 py-3 bg-transparent hover:bg-brand-background border-2 border-brand-secondary text-brand-secondary font-display rounded-none text-sm transition"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 bg-cyan-400 hover:bg-cyan-300 font-black text-slate-950 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/80 font-display text-white rounded-none shadow-[0_0_15px_rgba(124,58,237,0.5)] transition active:scale-95 flex items-center justify-center gap-2"
               >
                 CREATE ROOM <ArrowRight className="w-4 h-4" />
               </button>
@@ -147,7 +150,7 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
                 onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                 placeholder="e.g. Rahul, Viper"
                 maxLength={16}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-semibold focus:outline-none focus:border-fuchsia-400 focus:ring-4 focus:ring-fuchsia-400/15"
+                className="w-full bg-brand-background border-b-2 border-brand-accent rounded-none px-4 py-3 text-white font-display focus:outline-none focus:border-brand-primary focus:shadow-[0_0_10px_rgba(124,58,237,0.5)] transition"
               />
             </div>
 
@@ -161,23 +164,23 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
                 onChange={(e) => { setJoinCode(e.target.value.toUpperCase()); setError(''); }}
                 placeholder="e.g. AB7K9Q"
                 maxLength={6}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-amber-300 font-mono tracking-widest text-center font-black text-lg focus:outline-none focus:border-fuchsia-400 focus:ring-4 focus:ring-fuchsia-400/15"
+                className="w-full bg-brand-background border-b-2 border-brand-accent rounded-none px-4 py-3 text-brand-primary font-display tracking-[0.2em] text-center focus:outline-none focus:border-brand-primary focus:shadow-[0_0_15px_rgba(124,58,237,0.5)] transition uppercase"
               />
             </div>
 
-            {error && <p className="text-xs font-bold text-rose-400">{error}</p>}
+            {error && <p className="text-xs font-bold text-brand-accent">{error}</p>}
 
             <div className="flex gap-3 mt-2">
               <button
                 type="button"
                 onClick={() => setMode('home')}
-                className="px-4 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-700"
+                className="px-4 py-3 bg-transparent hover:bg-brand-background border-2 border-brand-secondary text-brand-secondary font-display rounded-none text-sm transition"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 bg-fuchsia-500 hover:bg-fuchsia-400 font-black text-white rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-brand-accent hover:bg-brand-accent/80 font-display text-white rounded-none shadow-[0_0_15px_rgba(244,63,94,0.5)] transition active:scale-95 flex items-center justify-center gap-2"
               >
                 JOIN ROOM <ArrowRight className="w-4 h-4" />
               </button>

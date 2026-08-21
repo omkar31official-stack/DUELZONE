@@ -6,14 +6,22 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['"Russo One"', 'sans-serif'],
+        body: ['"Chakra Petch"', 'sans-serif'],
+      },
       colors: {
         brand: {
+          background: '#0F0F23',
+          card: '#1E1C35',
+          primary: '#7C3AED',
+          secondary: '#A78BFA',
+          accent: '#F43F5E',
+          foreground: '#E2E8F0',
           dark: '#0f172a',
-          card: '#1e293b',
-          accent: '#8b5cf6',
           pink: '#ec4899',
-          yellow: '#eab308',
-          cyan: '#06b6d4'
+          cyan: '#06b6d4',
+          yellow: '#eab308'
         }
       }
     },
