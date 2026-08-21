@@ -123,16 +123,43 @@ export const FindMatchGame: React.FC<FindMatchProps> = ({
       )}
 
       {/* Boards Container */}
-      <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-items-center relative">
-        {/* My Board */}
-        <div className="flex flex-col items-center">
+      <div className="flex-1 w-full flex flex-col md:flex-row gap-8 items-center justify-center relative">
+        {/* Opponent Board (Top on mobile) */}
+        <div className="flex flex-col items-center opacity-90">
+          <span className="text-xs font-bold text-fuchsia-400 mb-3 uppercase tracking-widest">
+            {opponentPlayer?.name || 'Opponent'}'s Board
+          </span>
+          <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] bg-slate-300 rounded-full border-[10px] border-fuchsia-500/30 shadow-inner relative overflow-hidden flex items-center justify-center pointer-events-none">
+            {state.phase !== 'countdown' && oppSymbols.map((s: FindMatchSymbol, idx: number) => {
+              const angle = (idx / oppSymbols.length) * 2 * Math.PI;
+              const radius = 90;
+              const x = Math.cos(angle) * radius;
+              const y = Math.sin(angle) * radius;
+
+              return (
+                <div
+                  key={s.id + idx}
+                  style={{
+                    transform: `translate(${x}px, ${y}px) rotate(${s.rotation}deg) scale(${s.size * 26})`,
+                  }}
+                  className="absolute p-2"
+                >
+                  <SymbolIcon id={s.id} className="w-12 h-12 sm:w-16 sm:h-16 opacity-80 drop-shadow-sm" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* My Board (Bottom on mobile) */}
+        <div className="flex flex-col items-center mt-4 md:mt-0">
           <span className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-widest">
             Your Board
           </span>
           <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] bg-slate-200 rounded-full border-[10px] border-cyan-500/30 game-board-glow relative overflow-hidden flex items-center justify-center">
             {state.phase !== 'countdown' && mySymbols.map((s: FindMatchSymbol, idx: number) => {
               const angle = (idx / mySymbols.length) * 2 * Math.PI;
-              const radius = 100;
+              const radius = 90;
               const x = Math.cos(angle) * radius;
               const y = Math.sin(angle) * radius;
 
@@ -142,39 +169,12 @@ export const FindMatchGame: React.FC<FindMatchProps> = ({
                   onClick={() => handleSelect(s.id)}
                   disabled={state.phase !== 'playing'}
                   style={{
-                    transform: `translate(${x}px, ${y}px) rotate(${s.rotation}deg) scale(${s.size * 18})`,
+                    transform: `translate(${x}px, ${y}px) rotate(${s.rotation}deg) scale(${s.size * 26})`,
                   }}
                   className="absolute p-2 rounded-full hover:bg-black/10 transition-transform cursor-pointer"
                 >
-                  <SymbolIcon id={s.id} className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-md" />
+                  <SymbolIcon id={s.id} className="w-12 h-12 sm:w-16 sm:h-16 drop-shadow-md" />
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Opponent Board */}
-        <div className="flex flex-col items-center opacity-90">
-          <span className="text-xs font-bold text-fuchsia-400 mb-3 uppercase tracking-widest">
-            {opponentPlayer?.name || 'Opponent'}'s Board
-          </span>
-          <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] bg-slate-300 rounded-full border-[10px] border-fuchsia-500/30 shadow-inner relative overflow-hidden flex items-center justify-center pointer-events-none">
-            {state.phase !== 'countdown' && oppSymbols.map((s: FindMatchSymbol, idx: number) => {
-              const angle = (idx / oppSymbols.length) * 2 * Math.PI;
-              const radius = 100;
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
-
-              return (
-                <div
-                  key={s.id + idx}
-                  style={{
-                    transform: `translate(${x}px, ${y}px) rotate(${s.rotation}deg) scale(${s.size * 18})`,
-                  }}
-                  className="absolute p-2"
-                >
-                  <SymbolIcon id={s.id} className="w-10 h-10 sm:w-12 sm:h-12 opacity-80 drop-shadow-sm" />
-                </div>
               );
             })}
           </div>

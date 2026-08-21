@@ -43,7 +43,7 @@ export const TapRoyaleGame: React.FC<TapRoyaleProps> = ({ socket, state, current
           <p className="mb-3 text-xs font-black uppercase tracking-[0.35em] text-cyan-300">Party arena · 2-5 players</p>
           <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl">Tap Royale</h1>
           <p className="mt-3 max-w-lg text-sm font-semibold leading-6 text-slate-300">
-            Ten seconds. No mercy. Every player smashes the same glowing core and the highest score owns the room.
+            Twenty seconds. No mercy. Every player smashes the same glowing core and the highest score owns the room.
           </p>
 
           {state.phase === 'countdown' && (

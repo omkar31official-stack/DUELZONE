@@ -71,9 +71,9 @@ export const PicComboGame: React.FC<PicComboProps> = ({
           </div>
         </div>
 
-        {/* Category Hint */}
+        {/* Category Hint Removed */}
         <div className="text-xs font-bold text-slate-400 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
-          💡 Hint: <span className="text-slate-200">{currentQ.hint}</span> ({currentQ.answer.length} letters)
+          ({currentQ.answer.length} letters)
         </div>
 
         {/* Round result banner */}
