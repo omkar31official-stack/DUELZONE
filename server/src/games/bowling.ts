@@ -87,6 +87,88 @@ function calculateStandardBowlingScore(frames: BowlingFrame[]): number {
   return score;
 }
 
+const PIN_RADIUS = 0.08;
+const BALL_RADIUS = 0.12;
+
+const INITIAL_PINS = [
+  { id: 0, x: 0, y: 0.1 },
+  { id: 1, x: -0.15, y: 0.00 }, { id: 2, x: 0.15, y: 0.00 },
+  { id: 3, x: -0.3, y: -0.10 }, { id: 4, x: 0, y: -0.10 }, { id: 5, x: 0.3, y: -0.10 },
+  { id: 6, x: -0.45, y: -0.20 }, { id: 7, x: -0.15, y: -0.20 }, { id: 8, x: 0.15, y: -0.20 }, { id: 9, x: 0.45, y: -0.20 }
+];
+
+function simulateBowlingPhysics(startX: number, angle: number, power: number, activePinIds: number[]): number[] {
+  let ball = { x: startX, y: 1.5, vx: angle * power * 0.06, vy: -power * 0.08 };
+  
+  let pins = INITIAL_PINS.map(p => ({ ...p, vx: 0, vy: 0, isStanding: activePinIds.includes(p.id) }));
+  
+  for (let frame = 0; frame < 150; frame++) {
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+    
+    // Gutter detection (lane is x: -1 to 1)
+    if (ball.x < -1 || ball.x > 1) {
+      ball.x = -100; ball.vx = 0; ball.vy = 0;
+    }
+
+    for (let p of pins) {
+      if (!p.isStanding) continue;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.95;
+      p.vy *= 0.95;
+      
+      const orig = INITIAL_PINS[p.id];
+      const distSq = (p.x - orig.x)**2 + (p.y - orig.y)**2;
+      // If pin moves more than 0.1 units, it falls over
+      if (distSq > 0.01) p.isStanding = false;
+    }
+
+    // Ball -> Pin collisions
+    for (let p of pins) {
+      if (!p.isStanding) continue;
+      const dx = p.x - ball.x;
+      const dy = p.y - ball.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < BALL_RADIUS + PIN_RADIUS) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const force = 0.08 * power;
+        p.vx += nx * force;
+        p.vy += ny * force;
+        ball.vx *= 0.85;
+        ball.vy *= 0.85;
+      }
+    }
+
+    // Pin -> Pin collisions
+    for (let i = 0; i < pins.length; i++) {
+      if (!pins[i].isStanding) continue;
+      for (let j = i + 1; j < pins.length; j++) {
+        if (!pins[j].isStanding) continue;
+        const dx = pins[j].x - pins[i].x;
+        const dy = pins[j].y - pins[i].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < PIN_RADIUS * 2) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const relVx = pins[i].vx - pins[j].vx;
+          const relVy = pins[i].vy - pins[j].vy;
+          const transfer = (relVx * nx + relVy * ny) * 0.8;
+          if (transfer > 0) {
+            pins[i].vx -= nx * transfer;
+            pins[i].vy -= ny * transfer;
+            pins[j].vx += nx * transfer;
+            pins[j].vy += ny * transfer;
+          }
+        }
+      }
+    }
+  }
+
+  return pins.filter(p => !p.isStanding && activePinIds.includes(p.id)).map(p => p.id);
+}
+
 export function handleBowlingAction(state: BowlingState, player: string, action: any): BowlingState {
   const allPlayers = Object.keys(state.scores);
   if (action.type === 'START') {
@@ -97,36 +179,10 @@ export function handleBowlingAction(state: BowlingState, player: string, action:
     const currentPlayerId = allPlayers[state.currentTurnIndex];
     if (player !== currentPlayerId) return state; // Not your turn!
 
-    const { startX, angle, power } = action.payload; // startX: -1 to 1, angle: -1 to 1, power: 0 to 1
+    const { startX, angle, power } = action.payload; // startX: -1 to 1, angle: -1 to 1, power: 0.2 to 1
 
-    // Deterministic physics calculation for the throw
-    const endX = startX + angle * 2; // Where the ball crosses the pin line
-    let fallenPins: number[] = [];
-
-    // Gutter ball
-    if (endX < -1.2 || endX > 1.2) {
-      fallenPins = [];
-    } else {
-      // Perfect pocket hit is around -0.15 or 0.15
-      const offset = Math.abs(endX) - 0.15;
-      const accuracy = 1 - Math.min(1, Math.abs(offset) * 2);
-      
-      // Calculate how many pins fall based on accuracy and power
-      const hitStrength = accuracy * power;
-      const numPinsToFall = Math.floor(hitStrength * 10) + (Math.random() > 0.5 ? 1 : 0); // slight randomness for realism
-      
-      const availablePins = [...state.activePins];
-      if (numPinsToFall >= availablePins.length) {
-        fallenPins = [...availablePins];
-      } else {
-        for (let i = 0; i < numPinsToFall; i++) {
-          if (availablePins.length === 0) break;
-          const idx = Math.floor(Math.random() * availablePins.length);
-          fallenPins.push(availablePins[idx]);
-          availablePins.splice(idx, 1);
-        }
-      }
-    }
+    // True deterministic 2D physics simulation to get fallen pins
+    const fallenPins = simulateBowlingPhysics(startX, angle, power, state.activePins);
 
     const newActivePins = state.activePins.filter(p => !fallenPins.includes(p));
     const isStrike = state.currentRollIndex === 0 && fallenPins.length === 10;
