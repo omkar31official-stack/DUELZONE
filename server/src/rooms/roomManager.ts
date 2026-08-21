@@ -13,11 +13,13 @@ const rooms = new Map<string, Room>();
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function genCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const digits = '0123456789';
   let code = '';
-  const bytes = randomBytes(ROOM_CODE_LENGTH);
-  for (let i = 0; i < ROOM_CODE_LENGTH; i++) {
-    code += chars[bytes[i] % chars.length];
+  const bytes = randomBytes(6);
+  // First digit is 1-9 to avoid leading zero
+  code += digits[(bytes[0] % 9) + 1];
+  for (let i = 1; i < 6; i++) {
+    code += digits[bytes[i] % 10];
   }
   return code;
 }
