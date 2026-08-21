@@ -31,7 +31,8 @@ export type GameId =
   | 'chain-reaction'
   | 'coop-puzzle'
   | 'water-sort'
-  | 'sudoku';
+  | 'sudoku'
+  | '2048';
 
 export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
 
@@ -434,4 +435,16 @@ export interface SudokuState {
   mistakes: number;
   startedAt: number | null;
   completedAt: number | null;
+}
+
+export interface Game2048State {
+  phase: 'countdown' | 'playing' | 'gameover' | 'won';
+  board: number[][]; // 4x4 grid (0 for empty)
+  score: number;
+  bestScore: number;
+  moves: number;
+  startedAt: number | null;
+  completedAt: number | null;
+  lastMoveByPlayer: string | null;
+  lastMoveDirection: 'up' | 'down' | 'left' | 'right' | null;
 }

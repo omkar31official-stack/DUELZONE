@@ -335,6 +335,17 @@ export const ALL_GAMES: GameDefinitionMeta[] = [
     icon: '🔢',
   },
   {
+    id: '2048',
+    name: '2048 Co-op',
+    description: 'Combine matching tiles to reach 2048 together!',
+    category: 'MIND',
+    minPlayers: 1,
+    maxPlayers: 5,
+    estimatedMinutes: '5-10 min',
+    difficulty: 'Medium',
+    icon: '🧩',
+  },
+  {
     id: 'chain-reaction',
     name: 'Chain Reaction',
     description: 'Place orbs to explode into neighbor cells. Wipe out the opponent!',

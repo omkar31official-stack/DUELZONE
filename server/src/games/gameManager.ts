@@ -29,6 +29,7 @@ import { createChainReactionState, handleChainReactionAction } from '../games/ch
 import { createCoopPuzzleState, handleCoopPuzzleAction } from '../games/coopPuzzle';
 import { createWaterSortState, handleWaterSortAction } from '../games/waterSort';
 import { createSudokuState, handleSudokuAction } from '../games/sudoku';
+import { createGame2048State, handleGame2048Action } from '../games/game2048';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -132,6 +133,8 @@ export function createGameState(
       return { state: createWaterSortState(players) };
     case 'sudoku':
       return { state: createSudokuState(players) };
+    case '2048':
+      return { state: createGame2048State(players) };
     default:
       return { state: null };
   }
@@ -205,6 +208,8 @@ export function handleGameAction(
       return handleWaterSortAction(currentState as any, playerId, action);
     case 'sudoku':
       return handleSudokuAction(currentState as any, playerId, action);
+    case '2048':
+      return handleGame2048Action(currentState as any, playerId, action);
     default:
       return null;
   }
