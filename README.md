@@ -12,7 +12,7 @@ DUELZONE consists of two main parts:
 
 ---
 
-## Step 1: Push Code to GitHub
+## Step 1: Push Code to GitHub updated
 
 First, upload your project folder to GitHub:
 
