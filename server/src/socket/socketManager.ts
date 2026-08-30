@@ -172,6 +172,48 @@ export function registerSocketHandlers(io: AppServer) {
       if (room) io.to(roomCode).emit('room:update', RM.snapshot(room));
     });
 
+    // ─── Match Mode Selection ─────────────────────────────────────────────
+    socket.on('room:setMatchMode', ({ mode }) => {
+      const playerId = socket.data.playerId;
+      const roomCode = socket.data.roomCode;
+      if (!playerId || !roomCode) return;
+      const room = RM.getRoom(roomCode);
+      if (!room) return;
+      const player = room.players.find((p) => p.id === playerId);
+      if (!player?.isHost) return;
+
+      room.matchMode = mode;
+      io.to(roomCode).emit('room:update', RM.snapshot(room));
+    });
+
+    // ─── In-Game Reaction Handler ───────────────────────────────────────────
+    const reactionCooldowns = new Map<string, number>();
+
+    socket.on('reaction:send', ({ emote }) => {
+      const playerId = socket.data.playerId;
+      const roomCode = socket.data.roomCode;
+      if (!playerId || !roomCode) return;
+
+      const now = Date.now();
+      const lastSent = reactionCooldowns.get(playerId) || 0;
+      if (now - lastSent < 600) return;
+
+      const room = RM.getRoom(roomCode);
+      if (!room) return;
+      const player = room.players.find((p) => p.id === playerId);
+      if (!player) return;
+
+      reactionCooldowns.set(playerId, now);
+
+      io.to(roomCode).emit('reaction:received', {
+        id: uuidv4(),
+        senderId: playerId,
+        senderName: player.name,
+        emote: String(emote || '🔥').slice(0, 4),
+        timestamp: now,
+      });
+    });
+
     // ─── Chat ──────────────────────────────────────────────────────────────
     socket.on('chat:send', ({ text, emote }) => {
       const playerId = socket.data.playerId;

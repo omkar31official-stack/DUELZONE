@@ -33,9 +33,35 @@ export type GameId =
   | 'water-sort'
   | 'sudoku'
   | '2048'
-  | 'math-24';
+  | 'math-24'
+  | 'ping-pong'
+  | 'air-hockey'
+  | 'spinner-battle'
+  | 'snake-duel'
+  | 'mini-golf'
+  | 'tug-of-war'
+  | 'whack-mole'
+  | 'hand-slap'
+  | 'penalty-kicks'
+  | 'ultimate-ttt';
 
-export type GameCategory = 'REACTION' | 'STRATEGY' | 'BOARD' | 'ARCADE' | 'QUICK' | 'PARTY' | 'MIND';
+export type GameCategory =
+  | 'ARCADE'
+  | 'ACTION'
+  | 'SPORTS'
+  | 'RACING'
+  | 'REFLEX'
+  | 'PUZZLE'
+  | 'BOARD'
+  | 'SKILL'
+  | 'STRATEGY'
+  | 'CHAOS'
+  | 'REACTION'
+  | 'QUICK'
+  | 'PARTY'
+  | 'MIND';
+
+export type MatchMode = 'free' | 'bo3' | 'bo5' | 'bo7';
 
 export interface GameDefinitionMeta {
   id: GameId;
@@ -47,6 +73,9 @@ export interface GameDefinitionMeta {
   estimatedMinutes: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   icon: string; // emoji fallback
+  featured?: boolean;
+  popular?: boolean;
+  isNew?: boolean;
 }
 
 // ─── Players ──────────────────────────────────
@@ -71,9 +100,18 @@ export interface Room {
   status: RoomStatus;
   players: Player[];
   selectedGame: GameId | null;
+  matchMode?: MatchMode;
   gameState: unknown;
   createdAt: number;
   lastActivity: number;
+}
+
+export interface InGameReaction {
+  id: string;
+  senderId: string;
+  senderName: string;
+  emote: string;
+  timestamp: number;
 }
 
 // ─── Socket Events ────────────────────────────
@@ -83,6 +121,7 @@ export interface ServerToClientEvents {
   'game:state': (state: unknown) => void;
   'game:event': (event: GameEvent) => void;
   'chat:message': (msg: ChatMessage) => void;
+  'reaction:received': (reaction: InGameReaction) => void;
   'player:reconnected': (playerId: string) => void;
   'room:closed': (reason: string) => void;
   'webrtc:offer': (payload: { senderId: string; offer: unknown }) => void;
@@ -95,10 +134,12 @@ export interface ClientToServerEvents {
   'room:join': (payload: { code: string; playerName: string }, cb: (res: RoomJoinResponse) => void) => void;
   'room:reconnect': (payload: { code: string; playerId: string }, cb: (res: RoomJoinResponse) => void) => void;
   'room:selectGame': (payload: { gameId: GameId }) => void;
+  'room:setMatchMode': (payload: { mode: MatchMode }) => void;
   'room:startGame': () => void;
   'room:returnToLobby': () => void;
   'game:action': (payload: GameAction) => void;
   'chat:send': (payload: { text?: string; emote?: string }) => void;
+  'reaction:send': (payload: { emote: string }) => void;
   'webrtc:offer': (payload: { targetId: string; offer: unknown }) => void;
   'webrtc:answer': (payload: { targetId: string; answer: unknown }) => void;
   'webrtc:ice-candidate': (payload: { targetId: string; candidate: unknown }) => void;
@@ -130,6 +171,7 @@ export interface RoomSnapshot {
   status: RoomStatus;
   players: Player[];
   selectedGame: GameId | null;
+  matchMode?: MatchMode;
   gameState: unknown;
 }
 
@@ -460,4 +502,99 @@ export interface Math24State {
   scores: Record<string, number>;
   gameWinner: string | null;
   startedAt: number | null;
+}
+
+// ─── Ping Pong ────────────────────────────────
+export interface PingPongState {
+  scores: Record<string, number>;
+  paddles: Record<string, number>;
+  ball: { x: number; y: number; vx: number; vy: number };
+  winner: string | null;
+  targetScore: number;
+}
+
+// ─── Air Hockey ───────────────────────────────
+export interface AirHockeyState {
+  scores: Record<string, number>;
+  mallets: Record<string, { x: number; y: number }>;
+  puck: { x: number; y: number; vx: number; vy: number };
+  winner: string | null;
+  targetScore: number;
+}
+
+// ─── Spinner Battle ───────────────────────────
+export interface SpinnerBattleState {
+  scores: Record<string, number>;
+  spinners: Record<string, { x: number; y: number; vx: number; vy: number; radius: number }>;
+  winner: string | null;
+  ringRadius: number;
+}
+
+// ─── Snake Duel ───────────────────────────────
+export interface SnakeDuelState {
+  scores: Record<string, number>;
+  snakes: Record<string, { body: { x: number; y: number }[]; dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' }>;
+  apple: { x: number; y: number };
+  winner: string | null;
+  gridSize: number;
+}
+
+// ─── Mini Golf ────────────────────────────────
+export interface MiniGolfState {
+  scores: Record<string, number>;
+  strokes: Record<string, number>;
+  ball: { x: number; y: number; vx: number; vy: number };
+  hole: { x: number; y: number };
+  obstacle: { x: number; y: number; w: number; h: number };
+  currentTurn: string;
+  winner: string | null;
+  maxStrokes: number;
+}
+
+// ─── Tug Of War ───────────────────────────────
+export interface TugOfWarState {
+  scores: Record<string, number>;
+  ropePos: number;
+  winner: string | null;
+  targetWins: number;
+}
+
+// ─── Whack Mole ───────────────────────────────
+export interface WhackMoleState {
+  scores: Record<string, number>;
+  activeMoleIndex: number;
+  winner: string | null;
+  round: number;
+  maxRounds: number;
+}
+
+// ─── Hand Slap ────────────────────────────────
+export interface HandSlapState {
+  scores: Record<string, number>;
+  attackerId: string;
+  defenderId: string;
+  phase: 'ready' | 'slapped' | 'dodged';
+  winner: string | null;
+  targetWins: number;
+}
+
+// ─── Penalty Kicks ────────────────────────────
+export interface PenaltyKicksState {
+  scores: Record<string, number>;
+  round: number;
+  maxRounds: number;
+  kickerId: string;
+  keeperId: string;
+  kickResult: 'goal' | 'saved' | 'waiting' | null;
+  winner: string | null;
+}
+
+// ─── Ultimate TTT ─────────────────────────────
+export interface UltimateTTTState {
+  boards: (string | null)[][];
+  mainBoard: (string | null)[];
+  activeSubBoard: number | null;
+  currentTurn: string;
+  winner: string | null;
+  scores: Record<string, number>;
 }

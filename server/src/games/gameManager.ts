@@ -31,6 +31,16 @@ import { createWaterSortState, handleWaterSortAction } from '../games/waterSort'
 import { createSudokuState, handleSudokuAction } from '../games/sudoku';
 import { createGame2048State, handleGame2048Action } from '../games/game2048';
 import { createMath24State, handleMath24Action } from '../games/math24';
+import { createPingPongState, handlePingPongAction } from '../games/pingPong';
+import { createAirHockeyState, handleAirHockeyAction } from '../games/airHockey';
+import { createSpinnerBattleState, handleSpinnerBattleAction } from '../games/spinnerBattle';
+import { createSnakeDuelState, handleSnakeDuelAction } from '../games/snakeDuel';
+import { createMiniGolfState, handleMiniGolfAction } from '../games/miniGolf';
+import { createTugOfWarState, handleTugOfWarAction } from '../games/tugOfWar';
+import { createWhackMoleState, handleWhackMoleAction } from '../games/whackMole';
+import { createHandSlapState, handleHandSlapAction } from '../games/handSlap';
+import { createPenaltyKicksState, handlePenaltyKicksAction } from '../games/penaltyKicks';
+import { createUltimateTTTState, handleUltimateTTTAction } from '../games/ultimateTTT';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -138,6 +148,26 @@ export function createGameState(
       return { state: createGame2048State(players) };
     case 'math-24':
       return { state: createMath24State(players) };
+    case 'ping-pong':
+      return { state: createPingPongState(asDuelPlayers(players)) };
+    case 'air-hockey':
+      return { state: createAirHockeyState(asDuelPlayers(players)) };
+    case 'spinner-battle':
+      return { state: createSpinnerBattleState(asDuelPlayers(players)) };
+    case 'snake-duel':
+      return { state: createSnakeDuelState(asDuelPlayers(players)) };
+    case 'mini-golf':
+      return { state: createMiniGolfState(asDuelPlayers(players)) };
+    case 'tug-of-war':
+      return { state: createTugOfWarState(asDuelPlayers(players)) };
+    case 'whack-mole':
+      return { state: createWhackMoleState(asDuelPlayers(players)) };
+    case 'hand-slap':
+      return { state: createHandSlapState(asDuelPlayers(players)) };
+    case 'penalty-kicks':
+      return { state: createPenaltyKicksState(asDuelPlayers(players)) };
+    case 'ultimate-ttt':
+      return { state: createUltimateTTTState(asDuelPlayers(players)) };
     default:
       return { state: null };
   }
@@ -215,6 +245,26 @@ export function handleGameAction(
       return handleGame2048Action(currentState as any, playerId, action);
     case 'math-24':
       return handleMath24Action(currentState as any, playerId, action);
+    case 'ping-pong':
+      return handlePingPongAction(currentState as any, playerId, action);
+    case 'air-hockey':
+      return handleAirHockeyAction(currentState as any, playerId, action);
+    case 'spinner-battle':
+      return handleSpinnerBattleAction(currentState as any, playerId, action);
+    case 'snake-duel':
+      return handleSnakeDuelAction(currentState as any, playerId, action);
+    case 'mini-golf':
+      return handleMiniGolfAction(currentState as any, playerId, action);
+    case 'tug-of-war':
+      return handleTugOfWarAction(currentState as any, playerId, action);
+    case 'whack-mole':
+      return handleWhackMoleAction(currentState as any, playerId, action);
+    case 'hand-slap':
+      return handleHandSlapAction(currentState as any, playerId, action);
+    case 'penalty-kicks':
+      return handlePenaltyKicksAction(currentState as any, playerId, action);
+    case 'ultimate-ttt':
+      return handleUltimateTTTAction(currentState as any, playerId, action);
     default:
       return null;
   }

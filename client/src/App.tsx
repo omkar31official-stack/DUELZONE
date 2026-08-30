@@ -5,6 +5,9 @@ import { HomePage } from './components/HomePage';
 import { RoomLobby } from './components/RoomLobby';
 import { WinnerModal } from './components/WinnerModal';
 import { VideoPanel } from './components/VideoPanel';
+import { GameHUD } from './components/GameHUD';
+
+// Existing Mini-Games
 import { FindMatchGame } from './components/games/FindMatchGame';
 import { TicTacToeGame } from './components/games/TicTacToeGame';
 import { ReactionDuelGame } from './components/games/ReactionDuelGame';
@@ -36,7 +39,20 @@ import { WaterSortGame } from './components/games/WaterSortGame';
 import { SudokuGame } from './components/games/SudokuGame';
 import { Game2048 } from './components/games/Game2048';
 import { Math24Game } from './components/games/Math24Game';
-import { ALL_GAMES } from './shared/constants.ts';
+
+// 10 New Mini-Games
+import { PingPongGame } from './components/games/PingPongGame';
+import { AirHockeyGame } from './components/games/AirHockeyGame';
+import { SpinnerBattleGame } from './components/games/SpinnerBattleGame';
+import { SnakeDuelGame } from './components/games/SnakeDuelGame';
+import { MiniGolfGame } from './components/games/MiniGolfGame';
+import { TugOfWarGame } from './components/games/TugOfWarGame';
+import { WhackMoleGame } from './components/games/WhackMoleGame';
+import { HandSlapGame } from './components/games/HandSlapGame';
+import { PenaltyKicksGame } from './components/games/PenaltyKicksGame';
+import { UltimateTTTGame } from './components/games/UltimateTTTGame';
+
+import { ALL_GAMES } from './shared/constants';
 import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff, LogOut } from 'lucide-react';
 import { sounds } from './lib/sound';
 import { useMediaChat } from './hooks/useMediaChat';
@@ -61,6 +77,24 @@ export function App() {
     }
   }, [mediaError]);
 
+  // Attempt auto-reconnect from localStorage on load
+  useEffect(() => {
+    const savedCode = localStorage.getItem('duelzone_room_code');
+    const savedPlayerId = localStorage.getItem('duelzone_player_id');
+
+    if (savedCode && savedPlayerId && !room) {
+      socket.emit('room:reconnect', { code: savedCode, playerId: savedPlayerId }, (res) => {
+        if (res.ok && res.room && res.player) {
+          setRoom(res.room);
+          setCurrentPlayer(res.player);
+        } else {
+          localStorage.removeItem('duelzone_room_code');
+          localStorage.removeItem('duelzone_player_id');
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     socket.on('room:update', (updatedRoom) => {
       setRoom(updatedRoom);
@@ -82,6 +116,8 @@ export function App() {
     socket.on('room:closed', (reason) => {
       setRoom(null);
       setCurrentPlayer(null);
+      localStorage.removeItem('duelzone_room_code');
+      localStorage.removeItem('duelzone_player_id');
       setErrorMessage(reason);
       setTimeout(() => setErrorMessage(null), 4000);
     });
@@ -100,6 +136,8 @@ export function App() {
       if (res.ok && res.room && res.player) {
         setRoom(res.room);
         setCurrentPlayer(res.player);
+        localStorage.setItem('duelzone_room_code', res.room.code);
+        localStorage.setItem('duelzone_player_id', res.player.id);
       } else {
         setErrorMessage(res.error || 'Failed to create room.');
       }
@@ -111,6 +149,8 @@ export function App() {
       if (res.ok && res.room && res.player) {
         setRoom(res.room);
         setCurrentPlayer(res.player);
+        localStorage.setItem('duelzone_room_code', res.room.code);
+        localStorage.setItem('duelzone_player_id', res.player.id);
       } else {
         setErrorMessage(res.error || 'Failed to join room.');
       }
@@ -135,21 +175,22 @@ export function App() {
   const selectedGameMeta = ALL_GAMES.find((g) => g.id === room?.selectedGame);
 
   return (
-    <div className="min-h-screen text-slate-100 flex flex-col items-center p-4 sm:p-6 font-sans relative overflow-x-hidden arcade-bg">
+    <div className="min-h-screen text-slate-100 flex flex-col items-center font-sans relative overflow-x-hidden arcade-bg">
       <div className="pointer-events-none absolute inset-0 opacity-70 scanlines" />
+
       {/* Top Navbar */}
-      <header className="relative z-10 w-full max-w-7xl flex items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-950/55 px-5 py-4 mb-6 shadow-2xl backdrop-blur-xl">
+      <header className="relative z-10 w-full max-w-7xl flex items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-950/55 px-5 py-4 my-4 shadow-2xl backdrop-blur-xl">
         <div
           onClick={() => {
             if (!room) window.location.href = '/';
           }}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-300 via-fuchsia-500 to-amber-300 flex items-center justify-center shadow-lg font-black text-slate-950">
-            <Swords className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg font-black text-slate-950">
+            <Swords className="w-6 h-6 text-slate-950" />
           </div>
           <span className="text-2xl font-black tracking-tight text-white">
-            DUEL<span className="text-cyan-300">ZONE</span>
+            DUEL<span className="text-cyan-400">ZONE</span>
           </span>
         </div>
 
@@ -159,8 +200,8 @@ export function App() {
               <button
                 onClick={toggleMic}
                 className={`p-2.5 rounded-xl border transition active:scale-95 flex items-center gap-2 font-bold text-xs ${
-                  micEnabled 
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                  micEnabled
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
                     : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-400'
                 }`}
                 title="Toggle Voice Chat"
@@ -172,8 +213,8 @@ export function App() {
               <button
                 onClick={toggleCamera}
                 className={`p-2.5 rounded-xl border transition active:scale-95 flex items-center gap-2 font-bold text-xs ${
-                  cameraEnabled 
-                    ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.2)]' 
+                  cameraEnabled
+                    ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.2)]'
                     : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-400'
                 }`}
                 title="Toggle Video Chat"
@@ -200,7 +241,7 @@ export function App() {
 
           <button
             onClick={toggleSound}
-            className="p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition active:scale-95 text-slate-300 cursor-pointer focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-300"
+            className="p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition active:scale-95 text-slate-300 cursor-pointer"
             title="Toggle Game Sounds"
           >
             {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
@@ -208,7 +249,7 @@ export function App() {
         </div>
       </header>
 
-      {/* Floating Video Panel — always visible when any camera is on */}
+      {/* Floating WebRTC Video Panel */}
       {room && (
         <VideoPanel
           players={room.players}
@@ -230,165 +271,98 @@ export function App() {
       {!room ? (
         <HomePage onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} />
       ) : room.status === 'playing' && room.selectedGame && room.gameState ? (
-        <main className="relative z-10 w-full flex flex-col items-center justify-center">
+        <GameHUD socket={socket} room={room} currentPlayer={currentPlayer} messages={messages}>
+          {room.selectedGame === 'ping-pong' && (
+            <PingPongGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'air-hockey' && (
+            <AirHockeyGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'spinner-battle' && (
+            <SpinnerBattleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'snake-duel' && (
+            <SnakeDuelGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'mini-golf' && (
+            <MiniGolfGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'tug-of-war' && (
+            <TugOfWarGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'whack-mole' && (
+            <WhackMoleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'hand-slap' && (
+            <HandSlapGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'penalty-kicks' && (
+            <PenaltyKicksGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'ultimate-ttt' && (
+            <UltimateTTTGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+
+          {/* Existing Games */}
           {room.selectedGame === 'find-match' && (
-            <FindMatchGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <FindMatchGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'tic-tac-toe' && (
-            <TicTacToeGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <TicTacToeGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'reaction-duel' && (
-            <ReactionDuelGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <ReactionDuelGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'connect-four' && (
-            <ConnectFourGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <ConnectFourGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'rock-paper-scissors' && (
-            <RockPaperScissorsGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <RockPaperScissorsGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'quick-tap' && (
-            <QuickTapGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <QuickTapGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'memory-duel' && (
-            <MemoryDuelGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <MemoryDuelGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'number-battle' && (
-            <NumberBattleGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <NumberBattleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'color-clash' && (
-            <ColorClashGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <ColorClashGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'dots-and-boxes' && (
-            <DotsAndBoxesGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              opponentPlayer={opponent}
-            />
+            <DotsAndBoxesGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
           {room.selectedGame === 'tap-royale' && (
-            <TapRoyaleGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <TapRoyaleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'target-rush' && (
-            <TargetRushGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <TargetRushGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'word-scramble' && (
-            <WordScrambleGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <WordScrambleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'trivia-blitz' && (
-            <TriviaBlitzGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <TriviaBlitzGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'speed-math' && (
-            <SpeedMathGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <SpeedMathGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'pattern-master' && (
-            <PatternMasterGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <PatternMasterGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'pic-combo' && (
-            <PicComboGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
+            <PicComboGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />
           )}
           {room.selectedGame === 'archery' && <ArcheryGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'bowling' && <BowlingGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
-          {room.selectedGame === 'hammer' && (
-            <HammerGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
-          )}
+          {room.selectedGame === 'hammer' && <HammerGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'animal-balance' && <AnimalBalanceGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'ping-ball' && <PingBallGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'fruit-ninja' && <FruitNinjaGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'cornhole' && <CornholeGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
-          {room.selectedGame === 'knife-thrower' && (
-            <KnifeThrowerGame
-              socket={socket}
-              state={room.gameState as any}
-              currentPlayer={currentPlayer}
-              room={room}
-            />
-          )}
+          {room.selectedGame === 'knife-thrower' && <KnifeThrowerGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'chain-reaction' && <ChainReactionGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'coop-puzzle' && <CoopPuzzleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
           {room.selectedGame === 'water-sort' && <WaterSortGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} room={room} />}
@@ -406,7 +380,7 @@ export function App() {
               gameName={selectedGameMeta?.name || 'DUEL'}
             />
           )}
-        </main>
+        </GameHUD>
       ) : (
         <RoomLobby
           socket={socket}

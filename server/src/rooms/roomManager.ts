@@ -38,6 +38,7 @@ export function snapshot(room: Room): RoomSnapshot {
     status: room.status,
     players: room.players,
     selectedGame: room.selectedGame,
+    matchMode: room.matchMode,
     gameState: room.gameState,
   };
 }
