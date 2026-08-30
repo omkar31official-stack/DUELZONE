@@ -1,4 +1,4 @@
-import { GameState } from '../types';
+import { RiddleDuelState } from '../../../shared/types';
 
 export interface Riddle {
   id: number;
@@ -6,14 +6,6 @@ export interface Riddle {
   emojiHint: string;
   options: string[];
   answer: number;
-}
-
-export interface RiddleDuelState extends GameState {
-  scores: Record<string, number>;
-  currentRiddleIndex: number;
-  riddles: Riddle[];
-  answers: Record<string, number>;
-  winner: string | null;
 }
 
 const SAMPLE_RIDDLES: Riddle[] = [

@@ -1,18 +1,9 @@
-import { GameState } from '../types';
+import { CodeBreakerState } from '../../../shared/types';
 
 export interface CodeGuess {
   colors: string[];
-  blackPegs: number; // Correct color & correct position
-  whitePegs: number; // Correct color, wrong position
-}
-
-export interface CodeBreakerState extends GameState {
-  scores: Record<string, number>;
-  secretCode: string[];
-  guesses: Record<string, CodeGuess[]>;
-  currentTurn: string;
-  winner: string | null;
-  maxAttempts: number;
+  blackPegs: number;
+  whitePegs: number;
 }
 
 const COLOR_PALETTE = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠'];

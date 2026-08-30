@@ -5,6 +5,7 @@ import { Socket } from 'socket.io-client';
 import { Play, Copy, Check, Users, Crown, Lock, Sparkles, Trophy, Zap } from 'lucide-react';
 import { ChatBox } from './ChatBox';
 import { sounds } from '../lib/sound';
+import { useMusic } from '../music/MusicContext';
 
 interface LobbyProps {
   socket: Socket;
@@ -45,6 +46,7 @@ export const RoomLobby: React.FC<LobbyProps> = ({
   remoteStreams,
   localStream,
 }) => {
+  const { isPlaying, currentTrack } = useMusic();
   const [copied, setCopied] = useState(false);
   const isHost = currentPlayer?.isHost;
   const selectedGame = ALL_GAMES.find((game) => game.id === room.selectedGame);
@@ -150,7 +152,14 @@ export const RoomLobby: React.FC<LobbyProps> = ({
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-slate-400 font-medium">Wins: {player.gamesWon || 0}🏆</div>
+                        <div className="text-xs text-slate-400 font-medium flex items-center gap-2">
+                          <span>Wins: {player.gamesWon || 0}🏆</span>
+                          {isMe && isPlaying && currentTrack && (
+                            <span className="text-[10px] text-purple-300 font-bold flex items-center gap-1 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30 animate-pulse">
+                              🎵 Listening to {currentTrack.title}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span className={`text-xs font-semibold ${player.isConnected ? 'text-emerald-400' : 'text-rose-400'}`}>

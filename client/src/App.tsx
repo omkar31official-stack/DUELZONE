@@ -52,10 +52,19 @@ import { HandSlapGame } from './components/games/HandSlapGame';
 import { PenaltyKicksGame } from './components/games/PenaltyKicksGame';
 import { UltimateTTTGame } from './components/games/UltimateTTTGame';
 
+// 5 Newly Added Mini-Games
+import { LudoGame } from './components/games/LudoGame';
+import { EscapeRoomGame } from './components/games/EscapeRoomGame';
+import { RiddleDuelGame } from './components/games/RiddleDuelGame';
+import { CodeBreakerGame } from './components/games/CodeBreakerGame';
+import { SlidingPuzzleGame } from './components/games/SlidingPuzzleGame';
+
 import { ALL_GAMES } from './shared/constants';
 import { Volume2, VolumeX, Swords, Mic, MicOff, Video, VideoOff, LogOut } from 'lucide-react';
 import { sounds } from './lib/sound';
 import { useMediaChat } from './hooks/useMediaChat';
+import { MusicButton } from './components/music/MusicButton';
+import { MusicWidget } from './components/music/MusicWidget';
 
 export function App() {
   const [room, setRoom] = useState<RoomSnapshot | null>(null);
@@ -239,6 +248,8 @@ export function App() {
             </>
           )}
 
+          <MusicButton />
+
           <button
             onClick={toggleSound}
             className="p-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition active:scale-95 text-slate-300 cursor-pointer"
@@ -301,6 +312,21 @@ export function App() {
           )}
           {room.selectedGame === 'ultimate-ttt' && (
             <UltimateTTTGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'ludo' && (
+            <LudoGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'escape-room' && (
+            <EscapeRoomGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'riddle-duel' && (
+            <RiddleDuelGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'code-breaker' && (
+            <CodeBreakerGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
+          )}
+          {room.selectedGame === 'sliding-puzzle' && (
+            <SlidingPuzzleGame socket={socket} state={room.gameState as any} currentPlayer={currentPlayer} opponentPlayer={opponent} />
           )}
 
           {/* Existing Games */}
@@ -392,6 +418,9 @@ export function App() {
           localStream={localStream}
         />
       )}
+
+      {/* DUELZONE Party Music Widget */}
+      <MusicWidget />
     </div>
   );
 }

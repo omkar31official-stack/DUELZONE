@@ -69,12 +69,16 @@ export const HomePage: React.FC<HomeProps> = ({ onCreateRoom, onJoinRoom }) => {
     { key: 'POPULAR', label: 'Popular', icon: '👑' },
     { key: 'NEW', label: 'New', icon: '✨' },
     { key: 'FAVORITES', label: 'Favorites', icon: '❤️' },
+    { key: 'ESCAPE', label: 'Escape Room', icon: '🔐' },
+    { key: 'RIDDLES', label: 'Riddles', icon: '❓' },
+    { key: 'BRAIN', label: 'Brain & Logic', icon: '🧠' },
+    { key: 'BOARD', label: 'Board Games', icon: '🎲' },
     { key: 'ARCADE', label: 'Arcade', icon: '🕹️' },
     { key: 'ACTION', label: 'Action', icon: '⚔️' },
     { key: 'SPORTS', label: 'Sports', icon: '⚽' },
     { key: 'REFLEX', label: 'Reflex', icon: '⚡' },
     { key: 'STRATEGY', label: 'Strategy', icon: '♟️' },
-    { key: 'MIND', label: 'Mind & Puzzle', icon: '🧠' },
+    { key: 'MIND', label: 'Mind & Puzzle', icon: '🧩' },
   ];
 
   const filteredGames = useMemo(() => {

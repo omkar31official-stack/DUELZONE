@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { GameMetadata } from '../shared/types';
-import { Play, Star, Users, Clock, Info } from 'lucide-react';
+import React from 'react';
+import { GameDefinitionMeta } from '../shared/types';
+import { Play, Star, Users, Clock } from 'lucide-react';
 import { sounds } from '../lib/sound';
 
 interface GameCardProps {
-  game: GameMetadata;
+  game: GameDefinitionMeta;
   isSelected?: boolean;
   isFavorite?: boolean;
   onSelect: (gameId: string) => void;
@@ -18,8 +18,6 @@ export const GameCard: React.FC<GameCardProps> = ({
   onSelect,
   onToggleFavorite,
 }) => {
-  const [showDetails, setShowDetails] = useState(false);
-
   return (
     <div
       className={`relative group rounded-3xl transition-all duration-300 flex flex-col justify-between overflow-hidden border cursor-pointer ${
@@ -32,12 +30,12 @@ export const GameCard: React.FC<GameCardProps> = ({
       <div className="relative w-full h-36 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/60 flex items-center justify-center p-4 overflow-hidden">
         {/* Subtle Background Icon Pattern */}
         <span className="absolute text-9xl opacity-10 select-none pointer-events-none transform -rotate-12 group-hover:scale-125 transition-transform duration-500">
-          {game.thumbnail || '🎮'}
+          {game.icon || '🎮'}
         </span>
 
         {/* Center Thumbnail */}
         <span className="relative text-6xl filter drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-          {game.thumbnail || '🎮'}
+          {game.icon || '🎮'}
         </span>
 
         {/* Favorite Button (Top Right) */}
@@ -65,7 +63,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       <div className="p-4 flex flex-col gap-2 flex-grow justify-between">
         <div>
           <h3 className="font-extrabold text-lg text-white group-hover:text-cyan-300 transition-colors truncate">
-            {game.title}
+            {game.name}
           </h3>
           <p className="text-xs text-slate-400 line-clamp-2 mt-1 leading-relaxed">
             {game.description}
@@ -75,10 +73,10 @@ export const GameCard: React.FC<GameCardProps> = ({
         {/* Metadata Strip */}
         <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 pt-2 border-t border-slate-800/60 mt-2">
           <span className="flex items-center gap-1">
-            <Users className="w-3.5 h-3.5 text-slate-500" /> {game.playerCount || '2 Players'}
+            <Users className="w-3.5 h-3.5 text-slate-500" /> {game.minPlayers}-{game.maxPlayers} Players
           </span>
           <span className="flex items-center gap-1 text-amber-400/90">
-            <Clock className="w-3.5 h-3.5" /> {game.duration || '2m'}
+            <Clock className="w-3.5 h-3.5" /> {game.estimatedMinutes || '2m'}
           </span>
         </div>
 

@@ -167,7 +167,7 @@ players5.forEach((p, idx) => {
 assert(tb.roundWinner === 'p1', 'P1 wins Trivia Blitz round with correct answer');
 
 // 16. GAMEMANAGER INSTANTIATION & ACTION DISPATCH FOR ALL GAMES
-console.log('\n1️⃣6️⃣ Verifying GameManager Instantiation for ALL 27+ Games...');
+console.log('\n1️⃣6️⃣ Verifying GameManager Instantiation for ALL Games...');
 const gameIds: GameId[] = [
   'find-match', 'tic-tac-toe', 'connect-four', 'rock-paper-scissors',
   'reaction-duel', 'quick-tap', 'memory-duel', 'number-battle',
@@ -178,7 +178,8 @@ const gameIds: GameId[] = [
   'chain-reaction', 'coop-puzzle', 'water-sort', 'sudoku',
   '2048', 'math-24', 'ping-pong', 'air-hockey', 'spinner-battle',
   'snake-duel', 'mini-golf', 'tug-of-war', 'whack-mole',
-  'hand-slap', 'penalty-kicks', 'ultimate-ttt'
+  'hand-slap', 'penalty-kicks', 'ultimate-ttt',
+  'ludo', 'escape-room', 'riddle-duel', 'code-breaker', 'sliding-puzzle'
 ];
 
 let allCreated = true;
@@ -189,7 +190,7 @@ gameIds.forEach((id) => {
     allCreated = false;
   }
 });
-assert(allCreated, 'All 41 listed game IDs successfully initialized via GameManager');
+assert(allCreated, 'All 46 listed game IDs successfully initialized via GameManager');
 
 // 17. TUG OF WAR ACTION TEST
 console.log('\n1️⃣7️⃣ Testing Tug of War Action Handling...');
@@ -204,6 +205,36 @@ const { state: wamState } = createGameState('whack-mole', players2);
 const activeIndex = (wamState as any).activeMoleIndex;
 const nextWamState = handleGameAction('whack-mole', wamState, 'p1', { type: 'WHACK', payload: { index: activeIndex } }, 'ROOM1', dummyBroadcast);
 assert(nextWamState !== null && (nextWamState as any).scores['p1'] === 1, 'Whack-a-Mole action correctly scores point');
+
+// 19. LUDO GAME TEST
+console.log('\n1️⃣9️⃣ Testing Ludo Game Action Handling...');
+const { state: ludoState } = createGameState('ludo', players2);
+const rolledLudoState = handleGameAction('ludo', ludoState, 'p1', { type: 'ROLL_DICE' }, 'ROOM1', dummyBroadcast);
+assert(rolledLudoState !== null && (rolledLudoState as any).diceValue >= 1, 'Ludo dice roll generated valid number');
+
+// 20. ESCAPE ROOM GAME TEST
+console.log('\n2️⃣0️⃣ Testing Cyber Escape Room Action Handling...');
+const { state: escapeState } = createGameState('escape-room', players2);
+const nextEscapeState = handleGameAction('escape-room', escapeState, 'p1', { type: 'SUBMIT_CODE', payload: { code: '4829' } }, 'ROOM1', dummyBroadcast);
+assert(nextEscapeState !== null && (nextEscapeState as any).unlockedStages['p1'] === 2, 'Stage 1 code 4829 unlocks Stage 2');
+
+// 21. RIDDLE DUEL TEST
+console.log('\n2️⃣1️⃣ Testing Riddle Duel Action Handling...');
+const { state: riddleState } = createGameState('riddle-duel', players2);
+const answeredRiddleState = handleGameAction('riddle-duel', riddleState, 'p1', { type: 'ANSWER_RIDDLE', payload: { optionIndex: 1 } }, 'ROOM1', dummyBroadcast);
+assert(answeredRiddleState !== null && (answeredRiddleState as any).answers['p1'] === 1, 'Riddle answer option recorded for P1');
+
+// 22. CODE BREAKER TEST
+console.log('\n2️⃣2️⃣ Testing Mastermind Code Breaker Action Handling...');
+const { state: cbState } = createGameState('code-breaker', players2);
+const guessState = handleGameAction('code-breaker', cbState, 'p1', { type: 'SUBMIT_GUESS', payload: { colors: ['🔴', '🔵', '🟢', '🟡'] } }, 'ROOM1', dummyBroadcast);
+assert(guessState !== null && (guessState as any).guesses['p1'].length === 1, '4-color code guess submitted');
+
+// 23. SLIDING PUZZLE TEST
+console.log('\n2️⃣3️⃣ Testing Sliding Puzzle Race Action Handling...');
+const { state: spState } = createGameState('sliding-puzzle', players2);
+const movedSpState = handleGameAction('sliding-puzzle', spState, 'p1', { type: 'MOVE_TILE', payload: { tileIndex: 5 } }, 'ROOM1', dummyBroadcast);
+assert(movedSpState !== null, 'Sliding puzzle tile move dispatched');
 
 // Summary
 console.log('\n========================================');

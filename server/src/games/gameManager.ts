@@ -41,6 +41,11 @@ import { createWhackMoleState, handleWhackMoleAction } from '../games/whackMole'
 import { createHandSlapState, handleHandSlapAction } from '../games/handSlap';
 import { createPenaltyKicksState, handlePenaltyKicksAction } from '../games/penaltyKicks';
 import { createUltimateTTTState, handleUltimateTTTAction } from '../games/ultimateTTT';
+import { createLudoState, handleLudoAction } from '../games/ludo';
+import { createEscapeRoomState, handleEscapeRoomAction } from '../games/escapeRoom';
+import { createRiddleDuelState, handleRiddleDuelAction } from '../games/riddleDuel';
+import { createCodeBreakerState, handleCodeBreakerAction } from '../games/codeBreaker';
+import { createSlidingPuzzleState, handleSlidingPuzzleAction } from '../games/slidingPuzzle';
 import type { FindMatchRoundState } from '../../../shared/types';
 
 type GameState = unknown;
@@ -168,6 +173,16 @@ export function createGameState(
       return { state: createPenaltyKicksState(asDuelPlayers(players)) };
     case 'ultimate-ttt':
       return { state: createUltimateTTTState(asDuelPlayers(players)) };
+    case 'ludo':
+      return { state: createLudoState(asDuelPlayers(players)) };
+    case 'escape-room':
+      return { state: createEscapeRoomState(asDuelPlayers(players)) };
+    case 'riddle-duel':
+      return { state: createRiddleDuelState(asDuelPlayers(players)) };
+    case 'code-breaker':
+      return { state: createCodeBreakerState(asDuelPlayers(players)) };
+    case 'sliding-puzzle':
+      return { state: createSlidingPuzzleState(asDuelPlayers(players)) };
     default:
       return { state: null };
   }
@@ -265,6 +280,16 @@ export function handleGameAction(
       return handlePenaltyKicksAction(currentState as any, playerId, action);
     case 'ultimate-ttt':
       return handleUltimateTTTAction(currentState as any, playerId, action);
+    case 'ludo':
+      return handleLudoAction(currentState as any, playerId, action);
+    case 'escape-room':
+      return handleEscapeRoomAction(currentState as any, playerId, action);
+    case 'riddle-duel':
+      return handleRiddleDuelAction(currentState as any, playerId, action);
+    case 'code-breaker':
+      return handleCodeBreakerAction(currentState as any, playerId, action);
+    case 'sliding-puzzle':
+      return handleSlidingPuzzleAction(currentState as any, playerId, action);
     default:
       return null;
   }

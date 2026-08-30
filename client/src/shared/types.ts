@@ -43,7 +43,12 @@ export type GameId =
   | 'whack-mole'
   | 'hand-slap'
   | 'penalty-kicks'
-  | 'ultimate-ttt';
+  | 'ultimate-ttt'
+  | 'ludo'
+  | 'escape-room'
+  | 'riddle-duel'
+  | 'code-breaker'
+  | 'sliding-puzzle';
 
 export type GameCategory =
   | 'ARCADE'
@@ -59,7 +64,10 @@ export type GameCategory =
   | 'REACTION'
   | 'QUICK'
   | 'PARTY'
-  | 'MIND';
+  | 'MIND'
+  | 'BRAIN'
+  | 'RIDDLES'
+  | 'ESCAPE';
 
 export type MatchMode = 'free' | 'bo3' | 'bo5' | 'bo7';
 
@@ -596,4 +604,57 @@ export interface UltimateTTTState {
   currentTurn: string;
   winner: string | null;
   scores: Record<string, number>;
+}
+
+// ─── Ludo ─────────────────────────────────────
+export interface LudoToken {
+  id: number;
+  pos: number;
+  isFinished: boolean;
+}
+export interface LudoState {
+  scores: Record<string, number>;
+  tokens: Record<string, LudoToken[]>;
+  currentTurn: string;
+  diceValue: number | null;
+  hasRolled: boolean;
+  winner: string | null;
+  lastCapturedToken?: { player: string; tokenId: number };
+}
+
+// ─── Escape Room ──────────────────────────────
+export interface EscapeRoomState {
+  scores: Record<string, number>;
+  stage: number;
+  maxStages: number;
+  unlockedStages: Record<string, number>;
+  terminalOutput: string[];
+  clues: string[];
+  winner: string | null;
+}
+
+// ─── Riddle Duel ──────────────────────────────
+export interface RiddleDuelState {
+  scores: Record<string, number>;
+  currentRiddleIndex: number;
+  riddles: any[];
+  answers: Record<string, number>;
+  winner: string | null;
+}
+
+// ─── Code Breaker ─────────────────────────────
+export interface CodeBreakerState {
+  scores: Record<string, number>;
+  secretCode: string[];
+  guesses: Record<string, any[]>;
+  currentTurn: string;
+  winner: string | null;
+  maxAttempts: number;
+}
+
+// ─── Sliding Puzzle ───────────────────────────
+export interface SlidingPuzzleState {
+  scores: Record<string, number>;
+  boards: Record<string, number[]>;
+  winner: string | null;
 }

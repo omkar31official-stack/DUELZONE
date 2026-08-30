@@ -1,20 +1,4 @@
-import { GameState } from '../types';
-
-export interface LudoToken {
-  id: number;
-  pos: number; // -1 = home base, 0 to 51 = main track, 52 to 57 = home stretch, 58 = finished
-  isFinished: boolean;
-}
-
-export interface LudoState extends GameState {
-  scores: Record<string, number>;
-  tokens: Record<string, LudoToken[]>;
-  currentTurn: string;
-  diceValue: number | null;
-  hasRolled: boolean;
-  winner: string | null;
-  lastCapturedToken?: { player: string; tokenId: number };
-}
+import { LudoState, LudoToken } from '../../../shared/types';
 
 export const createLudoState = (players: string[]): LudoState => {
   const tokens: Record<string, LudoToken[]> = {};

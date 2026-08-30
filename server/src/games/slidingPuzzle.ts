@@ -1,10 +1,4 @@
-import { GameState } from '../types';
-
-export interface SlidingPuzzleState extends GameState {
-  scores: Record<string, number>;
-  boards: Record<string, number[]>; // Array of 9 numbers (0-8, 0 is blank)
-  winner: string | null;
-}
+import { SlidingPuzzleState } from '../../../shared/types';
 
 const SOLVED_BOARD = [1, 2, 3, 4, 5, 6, 7, 8, 0];
 

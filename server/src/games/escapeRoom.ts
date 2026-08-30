@@ -1,4 +1,4 @@
-import { GameState } from '../types';
+import { EscapeRoomState } from '../../../shared/types';
 
 export interface EscapeRoomStage {
   stageNum: number;
@@ -7,16 +7,6 @@ export interface EscapeRoomStage {
   wireSequence?: string[];
   terminalPrompt?: string;
   solution?: string;
-}
-
-export interface EscapeRoomState extends GameState {
-  scores: Record<string, number>;
-  stage: number;
-  maxStages: number;
-  unlockedStages: Record<string, number>;
-  terminalOutput: string[];
-  clues: string[];
-  winner: string | null;
 }
 
 const STAGES: EscapeRoomStage[] = [

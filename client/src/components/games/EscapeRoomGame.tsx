@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { Player, EscapeRoomState } from '../../shared/types';
-import { Keypad, ShieldAlert, Terminal, Lock } from 'lucide-react';
+import { ShieldAlert, Terminal, Lock } from 'lucide-react';
 import { sounds } from '../../lib/sound';
 
 interface EscapeRoomGameProps {
